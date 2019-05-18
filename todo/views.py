@@ -1,12 +1,12 @@
 from django.shortcuts import render,get_object_or_404
 from django.http import HttpResponse,HttpResponseRedirect
 from django.urls import reverse
-from .models import Post
-from .forms import PostForm
+from .models import Task
 
 from django.views import View
 from django.views.generic.edit import CreateView, DeleteView
 
+from .sprig import Line, Sprig
 
 # def index(req):
 #     posts = Post.objects.all()
@@ -26,32 +26,33 @@ from django.views.generic.edit import CreateView, DeleteView
 #     post.delete()
 #     return HttpResponseRedirect(reverse('index'))
 
-class PreviewTodo(View):
-    def get(self, req, *args, **kwargs):
-        posts = Post.objects.all()
-        form = PostForm
-        context = {'posts': posts, 'form': form}
+class ShowTask(View):
+    def show(self, req, *args, **kwargs):
+        tasks = Task.objects.all()
+        context = {'tasks': tasks}
         return render(req, 'todo/index.html', context)
 
 
-index = PreviewTodo.as_view()
+index = ShowTask.as_view()
 
 
-class CreateTodo(CreateView):
-    def post(self, req, *args, **kwargs):
-        form = PostForm(req.POST)
-        form.save(commit=True)
+class CreateTask(CreateView):
+    def create(self, req, *args, **kwargs):
+        sprig = Sprig(req.POST['sprig'])
+        for line in sprig.lines:
+            task = line.to_task(Task())
+            task.save(commit=True)
         return HttpResponseRedirect(reverse('index'))
 
 
-add = CreateTodo.as_view()
+add = CreateTask.as_view()
 
 
-class DeleteTodo(DeleteView):
+class DeleteTask(DeleteView):
     def delete(self, req, id=None):
-        post = get_object_or_404(Post, pk=id)
-        post.delete()
+        task = get_object_or_404(Task, pk=id)
+        task.delete()
         return HttpResponseRedirect(reverse('index'))
 
 
-delete = DeleteTodo.as_view()
+delete = DeleteTask.as_view()

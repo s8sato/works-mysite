@@ -25,14 +25,13 @@
             <!-- ToDoアプリ Post処理 -->
             <form action="{% url 'add' %}" method="post" name="form1">
                 {% csrf_token %}
-                <div class="text" accesskey="t">
-                        {{ form.message }}
+                <div class="text">
+                    <input type="text" name="sprig">
                 </div>
-
                 <!-- ToDo追加ボタン -->
                 <div class="form-group">
-                    <button type="submit" class="button" accesskey="s">
-                        ToDo追加
+                    <button type="submit" class="button">
+                        Sprig
                     </button>
                 </div>
             </form>
@@ -41,16 +40,16 @@
             <table class="todo list table">
                 <tbody>
                     <!-- for文回してtodoを取得、表示 -->
-                    {% for post in posts %}
+                    {% for task in tasks %}
                         <tr>
                             <td>
                                 <a href="#" class="todo" onfocus="on_focus(this)" onblur="on_blur(this)">
-                                    <div class="message">{{ post.message }}</div>
-                                    <div>{{ post.created_at }}</div>
+                                    <div class="message">{{ task.title }}</div>
+                                    <div>期限{{ task.deadline }}</div>
                                 </a>
                             </td>
                             <td>
-                                <form action="{% url 'delete' post.id %}" method="post" class="del_todo">
+                                <form action="{% url 'delete' task.id %}" method="post" class="del_todo">
                                     {% csrf_token %}
                                     <button class="button del">削除</button>
                                 </form>
