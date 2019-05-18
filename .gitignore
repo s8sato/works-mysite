@@ -1,3 +1,2 @@
 .idea/vcs.xml
-db.sqlite3
-todo/__pycache__/views.cpython-36.pyc
+*.pyc
