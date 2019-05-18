@@ -1,11 +1,11 @@
 from django.contrib import admin
-from .models import Post
+from .models import Task
 
 
 # レコード表示機能
-class PostAdmin(admin.ModelAdmin):
-    list_display = ('message', 'created_at')
-    list_display_links = ('message', 'created_at')
+class TaskAdmin(admin.ModelAdmin):
+    list_display = ('title', 'deadline')
+    # list_display_links = ('message', 'created_at')
 
 
-admin.site.register(Post, PostAdmin)
+admin.site.register(Task, TaskAdmin)
