@@ -1,0 +1,66 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>タスク管理アプリ</title>
+            <meta charset="utf-8">
+            <!-- CDN CSS(Karma CSS)
+            https://karmacss.com/en/latest/installation.html -->
+            <link rel="stylesheet" href="https://unpkg.com/karma-css@latest/dist/karma.min.css">
+
+            <!-- static配下のCSSファイルを参照 -->
+            <link rel="stylesheet"
+            href="{% static 'css/todo.css' %}" >
+
+    </head>
+    <body>
+        <div>メッセージ</div>
+        <div id="message"></div>
+        <div id="messageShift"></div>
+        <div id="messageCtrl"></div>
+        <div id="messageAlt"></div>
+        <!-- 固定枠 -->
+        <div class="container">
+            <h2 id="title1">ToDoリスト</h2>
+            <!-- ToDoアプリ Post処理 -->
+            <form action="{% url 'add' %}" method="post" name="form1">
+                {% csrf_token %}
+                <div class="text" accesskey="t">
+                        {{ form.message }}
+                </div>
+
+                <!-- ToDo追加ボタン -->
+                <div class="form-group">
+                    <button type="submit" class="button" accesskey="s">
+                        ToDo追加
+                    </button>
+                </div>
+            </form>
+
+            <!-- Todoリスト表示 -->
+            <table class="todo list table">
+                <tbody>
+                    <!-- for文回してtodoを取得、表示 -->
+                    {% for post in posts %}
+                        <tr>
+                            <td>
+                                <a href="#" class="todo" onfocus="on_focus(this)" onblur="on_blur(this)">
+                                    <div class="message">{{ post.message }}</div>
+                                    <div>{{ post.created_at }}</div>
+                                </a>
+                            </td>
+                            <td>
+                                <form action="{% url 'delete' post.id %}" method="post" class="del_todo">
+                                    {% csrf_token %}
+                                    <button class="button del">削除</button>
+                                </form>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <!-- static配下のJSファイルを参照 -->
+        <script type="text/javascript" src="{% static 'js/todo.js' %}"></script>
+    </body>
+</html>
