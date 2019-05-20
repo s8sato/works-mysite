@@ -50,8 +50,18 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/todo/sprig.py">
           <provider selected="true" editor-type-id="text-editor">
+<<<<<<< Updated upstream
             <state relative-caret-position="-260">
               <caret line="5" column="9" lean-forward="true" selection-start-line="5" selection-start-column="9" selection-end-line="5" selection-end-column="9" />
+=======
+            <state relative-caret-position="385">
+              <caret line="176" column="40" lean-forward="true" selection-start-line="176" selection-start-column="40" selection-end-line="176" selection-end-column="40" />
+              <folding>
+                <element signature="e#30#51#0" expanded="true" />
+                <element signature="e#694#715#0" />
+                <marker date="1558364466809" expanded="true" signature="737:1084" ph="..." />
+              </folding>
+>>>>>>> Stashed changes
             </state>
           </provider>
         </entry>
@@ -193,8 +203,10 @@
       <find>Task</find>
       <find>expected_t</find>
       <find>$</find>
-      <find>existing</find>
       <find>edges</find>
+      <find>existing</find>
+      <find>params</find>
+      <find>param</find>
     </findStrings>
     <replaceStrings>
       <replace>Task</replace>
@@ -207,6 +219,8 @@
       <replace>',</replace>
       <replace>,</replace>
       <replace>sprig.ad.edges</replace>
+      <replace>attrs</replace>
+      <replace>attr</replace>
     </replaceStrings>
   </component>
   <component name="Git.Settings">
@@ -223,8 +237,8 @@
         <option value="$PROJECT_DIR$/todo/forms.py" />
         <option value="$PROJECT_DIR$/todo/templates/todo/index.html" />
         <option value="$PROJECT_DIR$/todo/admin.py" />
-        <option value="$PROJECT_DIR$/todo/views.py" />
         <option value="$PROJECT_DIR$/todo/models.py" />
+        <option value="$PROJECT_DIR$/todo/views.py" />
         <option value="$PROJECT_DIR$/todo/sprig.py" />
       </list>
     </option>
@@ -479,7 +493,11 @@
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" weight="0.437058" />
       <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.27298445" />
+<<<<<<< Updated upstream
       <window_info anchor="bottom" id="Debug" order="3" weight="0.80763793" />
+=======
+      <window_info anchor="bottom" id="Debug" order="3" weight="0.48656294" />
+>>>>>>> Stashed changes
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="bottom" id="TODO" order="6" weight="0.32956153" />
@@ -574,20 +592,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/todo/forms.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="160">
-          <caret line="8" selection-start-line="8" selection-end-line="8" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/todo/admin.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="260">
-          <caret line="14" column="35" selection-start-line="14" selection-start-column="35" selection-end-line="14" selection-end-column="35" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/todo/apps.py">
       <provider selected="true" editor-type-id="text-editor" />
     </entry>
@@ -605,6 +609,25 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/todo/forms.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="160">
+          <caret line="8" selection-start-line="8" selection-end-line="8" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/todo/admin.py">
+      <provider selected="true" editor-type-id="text-editor">
+<<<<<<< Updated upstream
+        <state relative-caret-position="-1214">
+          <caret line="10" selection-start-line="10" selection-end-line="10" />
+=======
+        <state relative-caret-position="260">
+          <caret line="14" column="35" selection-start-line="14" selection-start-column="35" selection-end-line="14" selection-end-column="35" />
+>>>>>>> Stashed changes
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/todo/models.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-360">
@@ -616,8 +639,18 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/todo/sprig.py">
       <provider selected="true" editor-type-id="text-editor">
+<<<<<<< Updated upstream
         <state relative-caret-position="-260">
           <caret line="5" column="9" lean-forward="true" selection-start-line="5" selection-start-column="9" selection-end-line="5" selection-end-column="9" />
+=======
+        <state relative-caret-position="385">
+          <caret line="176" column="40" lean-forward="true" selection-start-line="176" selection-start-column="40" selection-end-line="176" selection-end-column="40" />
+          <folding>
+            <element signature="e#30#51#0" expanded="true" />
+            <element signature="e#694#715#0" />
+            <marker date="1558364466809" expanded="true" signature="737:1084" ph="..." />
+          </folding>
+>>>>>>> Stashed changes
         </state>
       </provider>
     </entry>

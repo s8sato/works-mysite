@@ -27,10 +27,10 @@
                 {% csrf_token %}
                 <div class="text">
                     <textarea name="sprig" cols="50" rows="10">
-[ドレスドオムライス完成]葉など飾る
+ドレスドオムライス完成] 葉など飾る
     成形したチキンライスに卵ドレスを乗せる
         チキンライスを茶碗で成形して皿に盛る
-            [チキンライス完成]コンソメとケチャップで調味
+            チキンライス完成] コンソメとケチャップで調味
                 ごはんと鶏肉をフライパンに入れて炒める
                     冷凍ごはんを戻す
                     冷凍ボイル鶏肉を戻す
@@ -43,7 +43,7 @@
                 卵に水溶き片栗粉を加える
                     ボウルに卵をとく
                 フライパンにバター
-                    フライパンをキレイに[チキンライス完成]
+                    フライパンをキレイに [チキンライス完成
                     </textarea>
                 </div>
                 <!-- ToDo追加ボタン -->
@@ -59,6 +59,7 @@
                 <tbody>
                     <!-- for文回してtodoを取得、表示 -->
                     {% for task in tasks %}
+                    {% if task.title != 'dummy' %}
                         <tr>
                             <td>
                                 <a href="#" class="todo" onfocus="on_focus(this)" onblur="on_blur(this)">
@@ -73,6 +74,7 @@
                                 </form>
                             </td>
                         </tr>
+                    {% endif %}
                     {% endfor %}
                 </tbody>
             </table>
