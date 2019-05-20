@@ -17,30 +17,59 @@ class Line:
         self.string = string
         self.indent = 0
         self.body = ''
-        self.tail_link = ''
-        self.head_link = ''
+        self.attrs = {
+            'head_link': '',
+            'title': '',
+            'start': datetime.datetime.now(),
+            'expected_time': datetime.timedelta(hours=1),
+            'actual_time': datetime.timedelta(),
+            'deadline': datetime.datetime.now() + datetime.timedelta(hours=1),
+            'client': 0,
+            'tail_link': '',
+            'is_done': False,
+            'note': '',
+        }
+        # self.head_link = ''
+        # self.title = ''
+        # self.start = datetime.datetime.now()
+        # self.expected_time = datetime.timedelta(hours=1)
+        # self.actual_time = datetime.timedelta()
+        # self.deadline = datetime.datetime.now() + datetime.timedelta(hours=1)
+        # self.client = 0
+        # self.tail_link = ''
         self.descendants = []
         self.parent = None
-        self.title = ''
-        self.start = datetime.datetime.now()
-        self.expected_time = datetime.timedelta(hours=1)
-        self.actual_time = datetime.timedelta()
-        self.deadline = datetime.datetime.now() + datetime.timedelta(hours=1)
-        self.client = 0
-        self.is_done = False
-        self.is_archived = False
-        self.note = ''
 
-        self.parse()
+        attrs = self.parse()[1]
+        self.set_attrs(attrs)
 
     def parse(self):
-        parser = re.search(r'^(({})*)(\[.*?\])?([^[]*)(\[.*?\])?'.format(INDENT), self.string)
+        parser = re.search(r'^(({})*)(.*)$'.format(INDENT), self.string)
         if parser:
             self.indent = parser.group(1).count(INDENT) or 0
-            self.head_link = parser.group(3) or ''
-            self.title = parser.group(4) or ''
-            self.tail_link = parser.group(5) or ''
-        return self.indent, self.body, self.tail_link, self.head_link
+            self.body = parser.group(3)
+        words = self.body.split(' ')
+        parser = {
+            'head_link': r'(.+)\]',
+            'start': r'(.+)-',
+            'expected_time': r'<(.+)>',
+            'deadline': r'-(.+)',
+            'client': r'@(.+)',
+            'tail_link': r'\[(.+)',
+        }
+        for word in words:
+            for attr in parser.keys():
+                if re.search(parser[attr], word):
+                    self.attrs[attr] = re.search(parser[attr], word).group(1)
+                    break
+            else:
+                self.attrs['title'] += word
+
+        return self.indent, self.attrs
+
+    def set_attrs(self, attrs):
+        for attr in attrs.keys():
+            self.attrs[attr] = attrs[attr]
 
 
 class Sprig:
@@ -78,58 +107,46 @@ class Sprig:
         else:
             return line.id - len(self.lines)
 
-    def show(self):
-        print('\n'.join([INDENT * line.indent
-                                + line.head_link
-                                + line.body
-                                + line.tail_link
-                         for line in self.lines]))
+    # def show(self):
+    #     print('\n'.join([INDENT * line.indent + line.attrs.values() for line in self.lines]))
 
     def get_head(self, line):
-        return [_ for _ in self.lines if _.head_link is line.tail_link]
+        return [_ for _ in self.lines if _.attrs['head_link'] == line.attrs['tail_link']]
 
     def get_tails(self, line):
-        return [_ for _ in self.lines if _.tail_link == line.head_link]
+        return [_ for _ in self.lines if _.attrs['tail_link'] == line.attrs['head_link']]
 
     def set_arrow_diagram(self):
         for line in self.lines:
             # 単純な関係でのedgeを張る。行が自身の下に固有のnodeをもつイメージ
-            attr = {
-                'title': line.title,
-                'start': line.start,
-                'expected_time': line.expected_time,
-                'actual_time': line.actual_time,
-                'deadline': line.deadline,
-                'client': line.client,
-                'is_done': line.is_done,
-                'note': line.note,
-            }
             initial = line.id
             terminal = line.parent.id if line.parent else line.id - len(self.lines)
-            self.ad.add_edge(initial, terminal, **attr)
+            self.ad.add_edge(initial, terminal, **line.attrs)
             # edgeを張ったことにより自動生成されたnodeを初期化
             self.ad.nodes[initial]['linker'] = ''
             self.ad.nodes[terminal]['linker'] = ''
 
             # head_linkとtail_linkの間にダミーedge（重み0）を張る
-            if line.head_link:
-                attr = {
+            if line.attrs['head_link']:
+                dummy_attrs = {
+                    'head_link': '',
                     'title': 'dummy',
                     'start': datetime.datetime.now(),
                     'expected_time': datetime.timedelta(),
                     'actual_time': datetime.timedelta(),
                     'deadline': datetime.datetime.now(),
                     'client': 0,
+                    'tail_link': '',
                     'is_done': True,
                     'note': '',
                 }
                 for tail in self.get_tails(line):
                     initial = line.parent.id
                     terminal = tail.id
-                    self.ad.add_edge(initial, terminal, **attr)
+                    self.ad.add_edge(initial, terminal, **dummy_attrs)
 
                 # linkerをhead_linkから継承
-                self.ad.nodes[initial]['linker'] = line.head_link
+                self.ad.nodes[terminal]['linker'] = line.attrs['head_link']
 
     def show_arrow_diagram(self):
         # nx.draw_networkx(self.ad, pos=nx.circular_layout(self.ad))
@@ -141,10 +158,10 @@ class Sprig:
 
 if __name__ == '__main__':
     omu = """
-[ドレスドオムライス完成]葉など飾る
+ドレスドオムライス完成] 葉など飾る
     成形したチキンライスに卵ドレスを乗せる
         チキンライスを茶碗で成形して皿に盛る
-            [チキンライス完成]コンソメとケチャップで調味
+            チキンライス完成] コンソメとケチャップで調味
                 ごはんと鶏肉をフライパンに入れて炒める
                     冷凍ごはんを戻す
                     冷凍ボイル鶏肉を戻す
@@ -157,11 +174,16 @@ if __name__ == '__main__':
                 卵に水溶き片栗粉を加える
                     ボウルに卵をとく
                 フライパンにバター
-                    フライパンをキレイに[チキンライス完成]
+                    フライパンをキレイに [チキンライス完成
 葉など飾る
     成形したチキンライスに卵ドレスを乗せる
         チキンライスを茶碗で成形して皿に盛る
 """
     omu = Sprig(omu)
-    omu.show()
+    # omu.show()
     omu.show_arrow_diagram()
+    tit = 'abc'
+    tit += 'def'
+    print(tit)
+    text = '        head_link] title start- <expected_time> -deadline @client [tail_link'
+    sprig = Sprig(text)
