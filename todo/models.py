@@ -23,8 +23,8 @@ class Step(models.Model):
         db_table = 'steps'
 
     # テーブルのカラムに対応するフィールドを定義
-    loc = models.IntegerField(verbose_name='位置番号', null=True)
-    linker = models.CharField(verbose_name='リンク名', null=True, max_length=255)
+    created_at = models.DateTimeField(auto_now_add=True, null=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
 
 class Task(models.Model):
@@ -38,10 +38,10 @@ class Task(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     title = models.CharField(verbose_name='タスク名', max_length=255)
-    start = models.DateTimeField(verbose_name='着手日時', null=True)
-    expected_time = models.DateTimeField(verbose_name='予想時間', default=datetime.timedelta(hours=1))  # todo デフォルト値
-    actual_time = models.DateTimeField(verbose_name='実績時間', default=datetime.timedelta(hours=1))  # todo デフォルト値
-    deadline = models.DateTimeField(verbose_name='納期', null=True, blank=True)  # todo デフォルト値
+    start = models.DateTimeField(verbose_name='着手日時', null=True, default=datetime.datetime.now())
+    expected_time = models.DurationField(verbose_name='予想時間', default=datetime.timedelta(hours=1))  # todo デフォルト値
+    actual_time = models.DurationField(verbose_name='実績時間', default=datetime.timedelta())  # todo デフォルト値
+    deadline = models.DateTimeField(verbose_name='納期', default=datetime.datetime.now() + datetime.timedelta(hours=1))  # todo デフォルト値
     client = models.IntegerField(verbose_name='依頼者', default=0)  # todo デフォルトは自分
     is_done = models.BooleanField(verbose_name='完了', default=False)
     note = models.TextField(verbose_name='備考', null=True)

@@ -41,61 +41,54 @@ index = ShowTask.as_view()
 class CreateTask(CreateView):
     """"""
     def post(self, req, *args, **kwargs):
-        try:
-            existing = Task.objects.all().order_by('-pk')[0].pk
-        except IndexError:
-            existing = 0
-        sprig = Sprig(req.POST['sprig'], existing)
-        for node in sprig.ad.nodes:
-            # self.step_as(node, sprig.ad.nodes).save()
-            Step.objects.update_or_create(
-                linker=sprig.ad.nodes[node]['linker'],
-                defaults={
-                    'loc': node,
-                    'linker': sprig.ad.nodes[node]['linker'],
-                }
-            )
-        for edge in sprig.ad.edges:
-            # self.task_as(edge, sprig.ad.edges).save()
-            Task.objects.update_or_create(
-                initial_step=Step.objects.get(loc=edge[0]),
-                terminal_step=Step.objects.get(loc=edge[1]),
-                defaults={
-                    'title': sprig.ad.edges[edge]['title'],
-                    'start': sprig.ad.edges[edge]['start'],
-                    'expected_time': sprig.ad.edges[edge]['expected_time'],
-                    'actual_time': sprig.ad.edges[edge]['actual_time'],
-                    'deadline': sprig.ad.edges[edge]['deadline'],
-                    'client': sprig.ad.edges[edge]['client'],
-                    'is_done': sprig.ad.edges[edge]['is_done'],
-                    'note': sprig.ad.edges[edge]['note'],
-                    'initial_step': Step.objects.get(loc=edge[0]),
-                    'terminal_step': Step.objects.get(loc=edge[1]),
-                }
-            )
-        return HttpResponseRedirect(reverse('index'))
+        # 入力テキストを有向グラフ構造をもったSprigインスタンスに変換する
+        sprig = Sprig(req.POST['sprig'])
 
-    # @staticmethod
-    # def step_as(node, nodes):
-    #     step = Step()
-    #     step.loc = node
-    #     step.linker = nodes[node]['linker']
-    #     return step
-    #
-    # @staticmethod
-    # def task_as(edge, edges):
-    #     task = Task()
-    #     task.title = edges[edge]['title']
-    #     task.start = edges[edge]['start']
-    #     task.expected_time = edges[edge]['expected_time']
-    #     task.actual_time = edges[edge]['actual_time']
-    #     task.deadline = edges[edge]['deadline']
-    #     task.client = edges[edge]['client']
-    #     task.is_done = edges[edge]['is_done']
-    #     task.note = edges[edge]['note']
-    #     task.initial_step = Step.objects.get(loc=edge[0])
-    #     task.terminal_step = Step.objects.get(loc=edge[1])
-    #     return task
+        # sprigのnodeを調べてstepを登録
+        node2step = {}
+        for node in sprig.ad.nodes:
+            # 既存のnodeを指すか調べ、そうでなければ新しく作る
+            try:
+                step = Step.objects.get(pk=int(sprig.ad.nodes[node]['linker']))
+            except Step.DoesNotExist:
+                step = Step()
+                step.save()
+            except ValueError:
+                step = Step()
+                step.save()
+            # node番号（一時的）とstep.pk（永続的）との対応をとる
+            node2step[node] = step.pk
+
+        # sprigのedgeを調べてtaskを登録
+        is_new_task = False
+        for edge in sprig.ad.edges:
+            # 既存のedgeを指すか調べ、そうでなければ新しく作る
+            try:
+                task = Task.objects.get(
+                    initial_step=Step.objects.get(pk=node2step[edge[0]]),
+                    terminal_step=Step.objects.get(pk=node2step[edge[1]])
+                )
+            except Task.DoesNotExist:
+                task = Task()
+                is_new_task = True
+
+            # 値を更新、または新しく設定
+            task.title = sprig.ad.edges[edge]['title']
+            task.start = sprig.ad.edges[edge]['start']
+            task.expected_time = sprig.ad.edges[edge]['expected_time']
+            task.actual_time = sprig.ad.edges[edge]['actual_time']
+            task.deadline = sprig.ad.edges[edge]['deadline']
+            task.client = sprig.ad.edges[edge]['client']
+            task.is_done = sprig.ad.edges[edge]['is_done']
+            task.note = sprig.ad.edges[edge]['note']
+            task.initial_step = Step.objects.get(pk=node2step[edge[0]])
+            task.terminal_step = Step.objects.get(pk=node2step[edge[1]])
+
+            if is_new_task:
+                task.save()
+                is_new_task = False
+
+        return HttpResponseRedirect(reverse('index'))
 
 
 add = CreateTask.as_view()
