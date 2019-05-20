@@ -2,8 +2,10 @@
 """
 """
 import networkx as nx
-import matplotlib.pyplot as plt
+# import matplotlib.pyplot as plt
 import re
+import datetime
+import uuid
 
 INDENT = "    "
 
@@ -21,14 +23,17 @@ class Line:
         self.descendants = []
         self.parent = None
         self.title = self.body
-        self.start = 0
-        self.expected_t = 0
-        self.actual_t = 0
-        self.deadline = 0
+        self.start = datetime.timedelta()
+        self.expected_time = datetime.timedelta()
+        self.actual_time = datetime.timedelta()
+        self.deadline = datetime.timedelta()
         self.client = None
         self.is_done = False
         self.is_archived = False
         self.note = ''
+
+        self.initial = None
+        self.terminal = None
 
         self.parse()
 
@@ -41,23 +46,11 @@ class Line:
             self.tail_link = parser.group(5) or ''
         return self.indent, self.body, self.tail_link, self.head_link
 
-    def to_task(self, task):
-        task.title = self.title
-        task.start = self.start
-        task.expected_time = self.expected_t
-        task.actual_time = self.actual_t
-        task.deadline = self.deadline
-        task.client = self.client
-        task.is_done = self.is_done
-        task.note = self.note
-        task.initial_step = None
-        task.terminal_step = None
-
 
 class Sprig:
     """"""
-    def __init__(self, sprig):
-        self.lines = [Line(i, string) for i, string in enumerate(sprig.splitlines())]
+    def __init__(self, sprig, existing):
+        self.lines = [Line(i + existing, string) for i, string in enumerate(sprig.splitlines())]
         self.set_descendants()
         self.set_parent()
         self.ad = nx.DiGraph()  # arrow_diagram
@@ -99,40 +92,46 @@ class Sprig:
     def get_head(self, line):
         return [_ for _ in self.lines if _.head_link is line.tail_link]
 
-    def get_tail(self, line):
+    def get_tails(self, line):
         return [_ for _ in self.lines if _.tail_link == line.head_link]
 
     def set_arrow_diagram(self):
         for line in self.lines:
+            # 単純な関係でのedgeを張る。行が自身の下に固有のnodeをもつイメージ
             if line.parent:
                 attr = {
                     'title': line.title,
                     'start': line.start,
-                    'expected_t': line.expected_t,
-                    'actual_t': line.actual_t,
+                    'expected_time': line.expected_time,
+                    'actual_time': line.actual_time,
                     'deadline': line.deadline,
                     'client': line.client,
                     'is_done': line.is_done,
-                    'is_archived': line.is_archived,
+                    'note': line.note,
                 }
-                self.ad.add_edge(line.id, line.parent.id, **attr)
+                line.initial = line.id
+                line.terminal = line.parent.id
+                self.ad.add_edge(line.initial, line.terminal, **attr)
+            # edgeを張ったことにより自動生成されたnodeを初期化
+            for node in self.ad.nodes:
+                self.ad.nodes[node]['linker'] = str(uuid.uuid4())
+            # ユーザ指定のlinker間にダミーエッジ（重み0）を張る
             if line.head_link:
                 attr = {
                     'title': 'dummy',
-                    'start': 0,
-                    'expected_t': 0,
-                    'actual_t': 0,
-                    'deadline': 0,
+                    'start': datetime.timedelta(),
+                    'expected_time': datetime.timedelta(),
+                    'actual_time': datetime.timedelta(),
+                    'deadline': datetime.timedelta(),
                     'client': None,
                     'is_done': True,
-                    'is_archived': True,
+                    'note': '',
                 }
-                for parent in self.get_tail(line):
-                    self.ad.add_edge(line.parent.id, parent.id, **attr)
-                    nx.set_node_attributes(self.ad, values={
-                        line.parent.id: {'linker': line.head_link},
-                        parent.id: {'linker': line.head_link},
-                    })
+                for tail in self.get_tails(line):
+                    initial_of_dummy = line.parent.id
+                    terminal_of_dummy = tail.id
+                    self.ad.add_edge(initial_of_dummy, terminal_of_dummy, **attr)
+
 
     def show_arrow_diagram(self):
         # nx.draw_networkx(self.ad, pos=nx.circular_layout(self.ad))
@@ -202,11 +201,11 @@ if __name__ == '__main__':
 
 
     # line = Line(0, '[ドレスドオムライス完成]葉など飾る')
-
-
     omu = Sprig(omu)
+    for node in omu.ad.nodes:
+        print(omu.ad.nodes[node]['linker'])
     omu.show()
-    omu.show_arrow_diagram()
+    # omu.show_arrow_diagram()
 
 
 """

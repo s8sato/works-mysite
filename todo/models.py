@@ -23,7 +23,8 @@ class Step(models.Model):
         db_table = 'steps'
 
     # テーブルのカラムに対応するフィールドを定義
-    title = models.CharField(verbose_name='ステップ名', null=True, max_length=255)
+    loc = models.IntegerField(verbose_name='位置番号', null=True)
+    linker = models.CharField(verbose_name='リンク名', null=True, max_length=255)
 
 
 class Task(models.Model):
@@ -46,12 +47,12 @@ class Task(models.Model):
     note = models.TextField(verbose_name='備考', null=True)
 
     initial_step = models.ForeignKey(Step,
-                                     related_name='initial_step',
+                                     related_name='out_tasks',
                                      verbose_name='始点',
                                      default=None,  # todo 唯一の最始点を設定する？
                                      on_delete=models.PROTECT)
     terminal_step = models.ForeignKey(Step,
-                                      related_name='terminal_step',
+                                      related_name='in_tasks',
                                       verbose_name='終点',
                                       default=None,   # todo デフォルトは最終点
                                       on_delete=models.PROTECT)
