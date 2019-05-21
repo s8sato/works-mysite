@@ -1,6 +1,6 @@
 #!/usr/bin/env python
-"""
-"""
+"""複数行テキスト入力の解析に関わるクラスを記述"""
+
 import networkx as nx
 # import matplotlib.pyplot as plt
 import re
@@ -17,65 +17,124 @@ class Line:
         self.string = string
         self.indent = 0
         self.body = ''
-        self.attrs = {
+        self.attrs = {  # attributes
             'head_link': '',
             'title': '',
             'start': datetime.datetime.now(),
-            'expected_time': datetime.timedelta(hours=1),
+            'expected_time': datetime.timedelta(),
             'actual_time': datetime.timedelta(),
-            'deadline': datetime.datetime.now() + datetime.timedelta(hours=1),
-            'client': 0,
+            'deadline': datetime.datetime.now(),
+            'client': 0,  # todo idではなくUserインスタンスに
             'tail_link': '',
             'is_done': False,
             'note': '',
         }
-        # self.head_link = ''
-        # self.title = ''
-        # self.start = datetime.datetime.now()
-        # self.expected_time = datetime.timedelta(hours=1)
-        # self.actual_time = datetime.timedelta()
-        # self.deadline = datetime.datetime.now() + datetime.timedelta(hours=1)
-        # self.client = 0
-        # self.tail_link = ''
         self.descendants = []
         self.parent = None
 
-        attrs = self.parse()[1]
-        self.set_attrs(attrs)
-
-    def parse(self):
-        parser = re.search(r'^(({})*)(.*)$'.format(INDENT), self.string)
-        if parser:
-            self.indent = parser.group(1).count(INDENT) or 0
-            self.body = parser.group(3)
-        words = self.body.split(' ')
-        parser = {
+        self.parser = {
             'head_link': r'(.+)\]',
-            'start': r'(.+)-',
-            'expected_time': r'<(.+)>',
-            'deadline': r'-(.+)',
-            'client': r'@(.+)',
+            'start_date': r'(\d{4})?/?(\d{1,2})?/(\d{1,2})-',
+            'start_time': r'(\d{1,2})?:(\d{1,2})?:?(\d{1,2})?-',
+            'expected_time': r'<w?(\d*)d?(\d*)h?(\d*)m?(\d*)s?(\d*)>',
+            'deadline_date': r'\-(\d{4})?/?(\d{1,2})?/(\d{1,2})',
+            'deadline_time': r'-(\d{1,2})?:(\d{1,2}):?(\d{1,2})?',
+            'client': r'@(\d+)',
             'tail_link': r'\[(.+)',
         }
+        self.parse()
+
+    def parse(self):
+        """行を解析し属性値を設定する"""
+        # 行をインデントと本文に分ける
+        match_obj = re.search(r'^(({})*)(.*)$'.format(INDENT), self.string)
+        if match_obj:
+            self.indent = match_obj.group(1).count(INDENT) or 0
+            self.body = match_obj.group(3)
+        # 本文を単語に分ける
+        words = self.body.split(' ')
         for word in words:
-            for attr in parser.keys():
-                if re.search(parser[attr], word):
-                    self.attrs[attr] = re.search(parser[attr], word).group(1)
+            # 単語が属性を表していれば属性値を設定し、そうでなければtitleに含める
+            for attr in self.parser.keys():
+                match_obj = re.search(self.parser[attr], word)
+                if match_obj:
+                    self.set_attrs(match_obj, attr)
                     break
             else:
-                self.attrs['title'] += word
-
+                self.attrs['title'] += ' {}'.format(word)
         return self.indent, self.attrs
 
-    def set_attrs(self, attrs):
-        for attr in attrs.keys():
-            self.attrs[attr] = attrs[attr]
+    def set_attrs(self, match_obj, attr):
+        now = datetime.datetime.now()
+        if attr == 'head_link':
+            self.attrs['head_link'] = match_obj.group(1)
+        elif attr == 'start_date' or attr == 'deadline_date':
+            # 日を決定
+            day = int(match_obj.group(3))
+            # 月を決定
+            if not match_obj.group(2) and now.day <= day:
+                month = now.month
+            elif not match_obj.group(2) and day < now.day:
+                month = now.month + 1
+            else:
+                month = int(match_obj.group(2))
+            # 年を決定
+            if not match_obj.group(1) and now. month <= month:
+                year = now.year
+            elif not match_obj.group(1) and month < now. month:
+                year = now.year + 1
+            else:
+                year = int(match_obj.group(1))
+            # 新しいdatetimeオブジェクトに置き換える
+            replacement = {
+                'day': day,
+                'month': month,
+                'year': year,
+            }
+            if attr == 'start_date':
+                self.attrs['start'] = self.attrs['start'].replace(**replacement)
+            else:
+                self.attrs['deadline'] = self.attrs['deadline'].replace(**replacement)
+        elif attr == 'start_time' or attr == 'deadline_time':
+            # 秒を決定
+            second = int(match_obj.group(3) or 0)
+            # 分を決定
+            minute = int(match_obj.group(2) or 0)
+            # 時を決定
+            if not match_obj.group(1) and now. minute <= minute:
+                hour = now.hour
+            elif not match_obj.group(1) and minute < now. minute:
+                hour = now.hour + 1
+            else:
+                hour = int(match_obj.group(1))
+            # 新しいdatetimeオブジェクトに置き換える
+            replacement = {
+                'second': second,
+                'minute': minute,
+                'hour': hour,
+            }
+            if attr == 'start_time':
+                self.attrs['start'] = self.attrs['start'].replace(**replacement)
+            else:
+                self.attrs['deadline'] = self.attrs['deadline'].replace(**replacement)
+        elif attr == 'expected_time':
+            self.attrs['expected_time'] += datetime.timedelta(
+                weeks=int(match_obj.group(1) or 0),
+                days=int(match_obj.group(2) or 0),
+                hours=int(match_obj.group(3) or 0),
+                minutes=int(match_obj.group(4) or 0),
+                seconds=int(match_obj.group(5) or 0),
+            )
+        elif attr == 'client':
+            self.attrs['client'] = int(match_obj.group(1))
+        elif attr == 'tail_link':
+            self.attrs['tail_link'] = match_obj.group(1)
 
 
 class Sprig:
     """複数行テキストを解析して有向グラフ構造をもたせたもの"""
-    def __init__(self, sprig):
-        self.lines = [Line(i, string) for i, string in enumerate(sprig.splitlines())]
+    def __init__(self, text):
+        self.lines = [Line(i, string) for i, string in enumerate(text.splitlines())]
         self.set_descendants()
         self.set_parent()
         self.ad = nx.DiGraph()  # arrow_diagram
@@ -179,11 +238,8 @@ if __name__ == '__main__':
     成形したチキンライスに卵ドレスを乗せる
         チキンライスを茶碗で成形して皿に盛る
 """
-    omu = Sprig(omu)
-    # omu.show()
-    omu.show_arrow_diagram()
-    tit = 'abc'
-    tit += 'def'
-    print(tit)
-    text = '        head_link] title start- <expected_time> -deadline @client [tail_link'
+    # omu = Sprig(omu)
+    # # omu.show()
+    # omu.show_arrow_diagram()
+    text = '        head_link] title /21- <d2h4> -/25 @8888 [tail_link'
     sprig = Sprig(text)
