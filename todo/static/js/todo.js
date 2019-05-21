@@ -21,7 +21,6 @@ function key_debug() {
     target = document.getElementById("messageCtrl");
     if (event.ctrlKey === true) {
         target.innerHTML = "Ctrlキーが押されました";
-        document.form1.submit();
     }
     else {
         target.innerHTML = "";
