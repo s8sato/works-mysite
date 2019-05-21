@@ -35,9 +35,9 @@ class Line:
         self.parser = {
             'head_link': r'(.+)\]',
             'start_date': r'(\d{4})?/?(\d{1,2})?/(\d{1,2})-',
-            'start_time': r'(\d{1,2})?:(\d{1,2})?:?(\d{1,2})?-',
-            'expected_time': r'<w?(\d*)d?(\d*)h?(\d*)m?(\d*)s?(\d*)>',
-            'deadline_date': r'\-(\d{4})?/?(\d{1,2})?/(\d{1,2})',
+            'start_time': r'(\d{1,2})?:(\d{1,2}):?(\d{1,2})?-',
+            'expected_time': r'<((\d+)w)?((\d+)d)?((\d+)h)?((\d+)m)?((\d+)s)?>',
+            'deadline_date': r'-(\d{4})?/?(\d{1,2})?/(\d{1,2})',
             'deadline_time': r'-(\d{1,2})?:(\d{1,2}):?(\d{1,2})?',
             'client': r'@(\d+)',
             'tail_link': r'\[(.+)',
@@ -119,11 +119,11 @@ class Line:
                 self.attrs['deadline'] = self.attrs['deadline'].replace(**replacement)
         elif attr == 'expected_time':
             self.attrs['expected_time'] += datetime.timedelta(
-                weeks=int(match_obj.group(1) or 0),
-                days=int(match_obj.group(2) or 0),
-                hours=int(match_obj.group(3) or 0),
-                minutes=int(match_obj.group(4) or 0),
-                seconds=int(match_obj.group(5) or 0),
+                weeks=int(match_obj.group(2) or 0),
+                days=int(match_obj.group(4) or 0),
+                hours=int(match_obj.group(6) or 0),
+                minutes=int(match_obj.group(8) or 0),
+                seconds=int(match_obj.group(10) or 0),
             )
         elif attr == 'client':
             self.attrs['client'] = int(match_obj.group(1))
