@@ -27,8 +27,8 @@
                 {% csrf_token %}
                 <div class="text">
                     <textarea name="sprig" cols="50" rows="10">
-head_link] task1 :30- <5h30m> -16:00 @8888 subtitle
-    task2 /27- <2d4h> -/3 @7777 [tail_link subtitle</textarea>
+head_link] task1 :30- <5h30m> -16:00 @8888 (note)
+    task2 /27- <2d4h> -/3 @7777 [tail_link (note)</textarea>
                 </div>
                 <!-- ToDo追加ボタン -->
                 <div class="form-group">
@@ -48,11 +48,14 @@ head_link] task1 :30- <5h30m> -16:00 @8888 subtitle
                             <td>
                                 <a href="#" class="todo" onfocus="on_focus(this)" onblur="on_blur(this)">
                                     <div class="message">{{ task.title }}</div>
-                                    <div>着手{{ task.start }}</div>
-                                    <div>所要{{ task.expected_time }}</div>
-                                    <div>実績{{ task.actual_time }}</div>
-                                    <div>期限{{ task.deadline }}</div>
-                                    <div>依頼者{{ task.client }}</div>
+                                    <div class="flex">
+                                        <div>着手{{ task.start }}</div>
+                                        <div>所要{{ task.expected_time }}</div>
+                                        <div>実績{{ task.actual_time }}</div>
+                                        <div>期限{{ task.deadline }}</div>
+                                        <div>依頼者{{ task.client }}</div>
+                                        <div>備考{{ task.note }}</div>
+                                    </div>
                                 </a>
                             </td>
                             <td>
