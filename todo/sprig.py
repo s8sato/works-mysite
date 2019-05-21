@@ -41,6 +41,7 @@ class Line:
             'deadline_time': r'-(\d{1,2})?:(\d{1,2}):?(\d{1,2})?',
             'client': r'@(\d+)',
             'tail_link': r'\[(.+)',
+            'note': r'\((.+)\)',
         }
         self.parse()
 
@@ -129,6 +130,8 @@ class Line:
             self.attrs['client'] = int(match_obj.group(1))
         elif attr == 'tail_link':
             self.attrs['tail_link'] = match_obj.group(1)
+        elif attr == 'note':
+            self.attrs['note'] = match_obj.group(1)
 
 
 class Sprig:

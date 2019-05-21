@@ -24,3 +24,11 @@ td {
     color: #a52a2a;
     background: #ffc0cb;
 }
+
+.flex{
+    display: -webkit-flex;
+    display: -moz-flex;
+    display: -ms-flex;
+    display: -o-flex;
+    display: flex;
+}
