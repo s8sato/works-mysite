@@ -37,7 +37,11 @@ head_link] task1 :30- <5h30m> -16:00 @8888 (note)
                     </button>
                 </div>
             </form>
-
+            <!-- すべて表示ボタン -->
+            <form action="{% url 'index' %}" method="post">
+                {% csrf_token %}
+                <button class="button">すべて表示</button>
+            </form>
             <!-- Todoリスト表示 -->
             <table class="todo list table">
                 <tbody>

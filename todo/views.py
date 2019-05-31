@@ -16,6 +16,9 @@ class ShowTask(View):
         context = {'tasks': tasks}
         return render(req, 'todo/index.html', context)
 
+    def post(self, req, *args, **kwargs):
+        return HttpResponseRedirect(reverse('index'))
+
 
 index = ShowTask.as_view()
 
