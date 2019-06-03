@@ -32,3 +32,12 @@ td {
     display: -o-flex;
     display: flex;
 }
+
+.fft{
+    font-family: 'Monotype Corsiva', 'Courier New';
+    font-size: 20px;
+}
+.mg{
+    margin-left: 5px;
+    margin-right: 5px;
+}
