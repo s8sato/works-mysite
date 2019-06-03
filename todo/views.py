@@ -9,11 +9,16 @@ from django.views.generic.edit import CreateView, DeleteView
 from .sprig import Line, Sprig
 import datetime
 
+
 class ShowTask(View):
     """"""
     def get(self, req, *args, **kwargs):
         tasks = Task.objects.all()
-        context = {'tasks': tasks}
+        context = {
+            'taskss': {
+                'tasks': tasks
+            }
+        }
         return render(req, 'todo/index.html', context)
 
     def post(self, req, *args, **kwargs):
@@ -81,10 +86,45 @@ add = CreateTask.as_view()
 
 class DeleteTask(DeleteView):
     """"""
-    def delete(self, req, id=None):
+    def delete(self, req, *args, **kwargs):
         task = get_object_or_404(Task, pk=id)
         task.delete()
         return HttpResponseRedirect(reverse('index'))
 
 
 delete = DeleteTask.as_view()
+
+
+class ShowTaskAround1(View):
+    """"""
+    def get(self, req, id=None):
+        me = Task.objects.get(pk=id)
+        initial = Step.objects.get(pk=me.initial_step.pk)
+        terminal = Step.objects.get(pk=me.terminal_step.pk)
+        in_tasks = Task.objects.filter(terminal_step=initial).all()
+        out_tasks = Task.objects.filter(initial_step=terminal).all()
+
+        # try:
+        #     in_tasks = Task.objects.filter(terminal_step=initial).all()
+        # except Task.DoesNotExist:
+        #     in_tasks = []
+        # try:
+        #     out_tasks = Task.objects.filter(initial_step=terminal).all()
+        # except Task.DoesNotExist:
+        #     out_tasks = []
+
+        context = {
+            'taskss': {
+                'out_tasks': out_tasks,
+                'me': [me],
+                'in_tasks': in_tasks,
+            }
+        }
+        return render(req, 'todo/index.html', context)
+
+    def post(self, req, id=None):
+        # return HttpResponseRedirect(reverse('index'))
+        return HttpResponseRedirect(reverse('show_around_1', args=[id]))
+
+
+show_around_1 = ShowTaskAround1.as_view()
