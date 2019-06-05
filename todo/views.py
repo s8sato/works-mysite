@@ -86,7 +86,7 @@ add = CreateTask.as_view()
 
 class DeleteTask(DeleteView):
     """"""
-    def delete(self, req, *args, **kwargs):
+    def delete(self, req, id=None):
         task = get_object_or_404(Task, pk=id)
         task.delete()
         return HttpResponseRedirect(reverse('index'))
@@ -98,9 +98,10 @@ delete = DeleteTask.as_view()
 class ShowTaskAround1(View):
     """"""
     def get(self, req, id=None):
-        me = Task.objects.get(pk=id)
-        initial = Step.objects.get(pk=me.initial_step.pk)
-        terminal = Step.objects.get(pk=me.terminal_step.pk)
+        me = Task.objects.filter(pk=id).all()
+        _me = me.get()
+        initial = Step.objects.get(pk=_me.initial_step.pk)
+        terminal = Step.objects.get(pk=_me.terminal_step.pk)
         in_tasks = Task.objects.filter(terminal_step=initial).all()
         out_tasks = Task.objects.filter(initial_step=terminal).all()
 
@@ -116,7 +117,7 @@ class ShowTaskAround1(View):
         context = {
             'taskss': {
                 'out_tasks': out_tasks,
-                'me': [me],
+                'me': me,
                 'in_tasks': in_tasks,
             }
         }
