@@ -32,3 +32,22 @@ td {
     display: -o-flex;
     display: flex;
 }
+
+.fft{
+    font-family: 'Monotype Corsiva', 'Courier New';
+    font-size: 20px;
+}
+.mg{
+    margin-left: 5px;
+    margin-right: 5px;
+}
+
+.out_tasks{
+    padding-left: 0px;
+}
+.me{
+    padding-left: 30px;
+}
+.in_tasks{
+    padding-left: 60px;
+}

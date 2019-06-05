@@ -9,12 +9,20 @@ from django.views.generic.edit import CreateView, DeleteView
 from .sprig import Line, Sprig
 import datetime
 
+
 class ShowTask(View):
     """"""
     def get(self, req, *args, **kwargs):
         tasks = Task.objects.all()
-        context = {'tasks': tasks}
+        context = {
+            'taskss': {
+                'tasks': tasks
+            }
+        }
         return render(req, 'todo/index.html', context)
+
+    def post(self, req, *args, **kwargs):
+        return HttpResponseRedirect(reverse('index'))
 
 
 index = ShowTask.as_view()
@@ -85,3 +93,51 @@ class DeleteTask(DeleteView):
 
 
 delete = DeleteTask.as_view()
+
+
+class ShowTaskAround1(View):
+    """"""
+    def get(self, req, id=None):
+        me = Task.objects.filter(pk=id).all()
+        _me = me.get()
+        initial = Step.objects.get(pk=_me.initial_step.pk)
+        terminal = Step.objects.get(pk=_me.terminal_step.pk)
+        in_tasks = Task.objects.filter(terminal_step=initial).all()
+        out_tasks = Task.objects.filter(initial_step=terminal).all()
+
+        context = {
+            'taskss': {
+                'out_tasks': out_tasks,
+                'me': me,
+                'in_tasks': in_tasks,
+            }
+        }
+        return render(req, 'todo/index.html', context)
+
+    def post(self, req, id=None):
+        return HttpResponseRedirect(reverse('show_around_1', args=[id]))
+
+
+show_around_1 = ShowTaskAround1.as_view()
+
+
+class ShowTaskBuds(View):
+    """"""
+    def get(self, req, *args, **kwargs):
+        tasks = Task.objects.filter(is_done=False).all()
+        # bus(初動タスク)であるとは、始点がどんなタスクの終点でもないこと
+        terminal_steps = [task.terminal_step for task in tasks]
+        buds = [_ for _ in tasks if _.initial_step not in terminal_steps]
+
+        context = {
+            'taskss': {
+                'tasks': buds
+            }
+        }
+        return render(req, 'todo/index.html', context)
+
+    def post(self, req, *args, **kwargs):
+        return HttpResponseRedirect(reverse('show_buds'))
+
+
+show_buds = ShowTaskBuds.as_view()
