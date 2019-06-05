@@ -141,3 +141,25 @@ class ShowTaskBuds(View):
 
 
 show_buds = ShowTaskBuds.as_view()
+
+
+class ShowTaskTrunk(View):
+    """"""
+    def get(self, req, *args, **kwargs):
+        tasks = Task.objects.filter(is_done=False).all()
+        # trunk(幹、最終タスク)であるとは、終点がどんなタスクの始点でもないこと
+        initial_steps = [task.initial_step for task in tasks]
+        trunk = [_ for _ in tasks if _.terminal_step not in initial_steps]
+
+        context = {
+            'taskss': {
+                'tasks': trunk
+            }
+        }
+        return render(req, 'todo/index.html', context)
+
+    def post(self, req, *args, **kwargs):
+        return HttpResponseRedirect(reverse('show_trunk'))
+
+
+show_trunk = ShowTaskTrunk.as_view()
