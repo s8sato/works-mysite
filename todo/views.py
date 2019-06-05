@@ -105,15 +105,6 @@ class ShowTaskAround1(View):
         in_tasks = Task.objects.filter(terminal_step=initial).all()
         out_tasks = Task.objects.filter(initial_step=terminal).all()
 
-        # try:
-        #     in_tasks = Task.objects.filter(terminal_step=initial).all()
-        # except Task.DoesNotExist:
-        #     in_tasks = []
-        # try:
-        #     out_tasks = Task.objects.filter(initial_step=terminal).all()
-        # except Task.DoesNotExist:
-        #     out_tasks = []
-
         context = {
             'taskss': {
                 'out_tasks': out_tasks,
@@ -124,8 +115,29 @@ class ShowTaskAround1(View):
         return render(req, 'todo/index.html', context)
 
     def post(self, req, id=None):
-        # return HttpResponseRedirect(reverse('index'))
         return HttpResponseRedirect(reverse('show_around_1', args=[id]))
 
 
 show_around_1 = ShowTaskAround1.as_view()
+
+
+class ShowTaskBuds(View):
+    """"""
+    def get(self, req, *args, **kwargs):
+        tasks = Task.objects.filter(is_done=False).all()
+        # bus(初動タスク)であるとは、始点がどんなタスクの終点でもないこと
+        terminal_steps = [task.terminal_step for task in tasks]
+        buds = [_ for _ in tasks if _.initial_step not in terminal_steps]
+
+        context = {
+            'taskss': {
+                'tasks': buds
+            }
+        }
+        return render(req, 'todo/index.html', context)
+
+    def post(self, req, *args, **kwargs):
+        return HttpResponseRedirect(reverse('show_buds'))
+
+
+show_buds = ShowTaskBuds.as_view()
