@@ -45,6 +45,11 @@ head_link] task1 :30- <5h30m> -16:00 @8888 (note)
                         {% csrf_token %}
                         <button class="button">すべて表示</button>
                     </form>
+                    <!-- 最終タスク表示ボタン -->
+                    <form action="{% url 'show_trunk' %}" method="post">
+                        {% csrf_token %}
+                        <button class="button">最終タスク表示</button>
+                    </form>
                     <!-- 初動タスク表示ボタン -->
                     <form action="{% url 'show_buds' %}" method="post">
                         {% csrf_token %}
