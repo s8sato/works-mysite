@@ -9,4 +9,5 @@ urlpatterns = [
     path('show_around_1/<int:id>', views.show_around_1, name='show_around_1'),
     path('show_buds', views.show_buds, name='show_buds'),
     path('show_trunk', views.show_trunk, name='show_trunk'),
+    path('register', views.register, name='register'),
 ]

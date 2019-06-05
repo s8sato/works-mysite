@@ -1,0 +1,42 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>タスク管理アプリ</title>
+            <meta charset="utf-8">
+            <!-- CDN CSS(Karma CSS)
+            https://karmacss.com/en/latest/installation.html -->
+            <link rel="stylesheet" href="https://unpkg.com/karma-css@latest/dist/karma.min.css">
+
+            <!-- static配下のCSSファイルを参照 -->
+            <link rel="stylesheet"
+            href="{% static 'css/todo.css' %}" >
+
+    </head>
+    <body>
+        <div>メッセージ</div>
+        <div id="message"></div>
+        <div id="messageShift"></div>
+        <div id="messageCtrl"></div>
+        <div id="messageAlt"></div>
+        <!-- 固定枠 -->
+        <div class="container">
+            <h2 id="title1">ToDoリスト</h2>
+            <!-- ToDoアプリ Post処理 -->
+            <form action="{% url 'add' %}" method="post" name="form1">
+                {% csrf_token %}
+                <div class="text">
+                    <textarea name="sprig" cols="50" rows="10">{{ default_text }}</textarea>
+                </div>
+                <!-- ToDo追加ボタン -->
+                <div class="form-group">
+                    <button type="submit" class="button">
+                        Sprig
+                    </button>
+                </div>
+            </form>
+        </div>
+        <!-- static配下のJSファイルを参照 -->
+        <script type="text/javascript" src="{% static 'js/todo.js' %}"></script>
+    </body>
+</html>

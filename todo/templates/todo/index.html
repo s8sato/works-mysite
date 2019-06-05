@@ -22,23 +22,13 @@
         <!-- 固定枠 -->
         <div class="container">
             <h2 id="title1">ToDoリスト</h2>
-            <!-- ToDoアプリ Post処理 -->
-            <form action="{% url 'add' %}" method="post" name="form1">
-                {% csrf_token %}
-                <div class="text">
-                    <textarea name="sprig" cols="50" rows="10">
-head_link] task1 :30- <5h30m> -16:00 @8888 (note)
-    task2 /27- <2d4h> -/3 @7777 [tail_link (note)</textarea>
-                </div>
-                <!-- ToDo追加ボタン -->
-                <div class="form-group">
-                    <button type="submit" class="button">
-                        Sprig
-                    </button>
-                </div>
             <!-- Todoリスト表示 -->
             <table class="todo list table">
                 <tbody>
+                    <!-- 新規登録ボタン -->
+                    <form action="{% url 'register' %}" method="post">
+                        {% csrf_token %}
+                        <button class="button">新規登録</button>
                     </form>
                     <!-- すべて表示ボタン -->
                     <form action="{% url 'index' %}" method="post">

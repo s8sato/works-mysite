@@ -163,3 +163,22 @@ class ShowTaskTrunk(View):
 
 
 show_trunk = ShowTaskTrunk.as_view()
+
+
+class ShowRegisterForm(View):
+    """"""
+
+    DEFAULT_TEXT = """head_link] task1 :30- <5h30m> -16:00 @8888 (note)
+    task2 /27- <2d4h> -/3 @7777 [tail_link (note)"""
+
+    def get(self, req, default_text=DEFAULT_TEXT):
+        context = {
+            'default_text': default_text
+        }
+        return render(req, 'todo/register.html', context)
+
+    def post(self, req, *args, **kwargs):
+        return HttpResponseRedirect(reverse('register'))
+
+
+register = ShowRegisterForm.as_view()
