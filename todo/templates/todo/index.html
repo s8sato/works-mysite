@@ -46,8 +46,8 @@ head_link] task1 :30- <5h30m> -16:00 @8888 (note)
             <table class="todo list table">
                 <tbody>
                     <!-- for文回してtodoを取得、表示 -->
-                    {% for key, value in taskss.items %}
-                        {% for task in value %}
+                    {% for key, tasks in taskss.items %}
+                        {% for task in tasks %}
                             <tr>
                                 <td class="{{ key }}">
                                     <a href="#" class="todo" onfocus="on_focus(this)" onblur="on_blur(this)">
@@ -69,9 +69,9 @@ head_link] task1 :30- <5h30m> -16:00 @8888 (note)
                                     </a>
                                 </td>
                                 <td>
-                                    <form action="{% url 'show_around_1' task.id %}" method="post" class="del_todo">
+                                    <form action="{% url 'show_around_1' task.id %}" method="post">
                                         {% csrf_token %}
-                                        <button class="button del">これ中心</button>
+                                        <button class="button">これ中心</button>
                                     </form>
                                     <form action="{% url 'delete' task.id %}" method="post" class="del_todo">
                                         {% csrf_token %}
