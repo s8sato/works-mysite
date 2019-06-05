@@ -36,15 +36,20 @@ head_link] task1 :30- <5h30m> -16:00 @8888 (note)
                         Sprig
                     </button>
                 </div>
-            </form>
-            <!-- すべて表示ボタン -->
-            <form action="{% url 'index' %}" method="post">
-                {% csrf_token %}
-                <button class="button">すべて表示</button>
-            </form>
             <!-- Todoリスト表示 -->
             <table class="todo list table">
                 <tbody>
+                    </form>
+                    <!-- すべて表示ボタン -->
+                    <form action="{% url 'index' %}" method="post">
+                        {% csrf_token %}
+                        <button class="button">すべて表示</button>
+                    </form>
+                    <!-- 初動タスク表示ボタン -->
+                    <form action="{% url 'show_buds' %}" method="post">
+                        {% csrf_token %}
+                        <button class="button">初動タスク表示</button>
+                    </form>
                     <!-- for文回してtodoを取得、表示 -->
                     {% for key, tasks in taskss.items %}
                         {% for task in tasks %}

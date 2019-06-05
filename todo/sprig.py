@@ -199,7 +199,7 @@ class Sprig:
                     'deadline': datetime.datetime.now(),
                     'client': 0,
                     'tail_link': '',
-                    'is_done': True,
+                    'is_done': False,
                     'note': '',
                 }
                 for tail in self.get_tails(line):
@@ -245,4 +245,5 @@ if __name__ == '__main__':
     # # omu.show()
     # omu.show_arrow_diagram()
     text = '        head_link] title /21- <d2h4> -/25 @8888 [tail_link'
-    sprig = Sprig(text)
+    sprig = Sprig(omu)
+    print(sprig.ad.in_edges(1))
