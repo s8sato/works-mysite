@@ -73,6 +73,8 @@ head_link] task1 :30- <5h30m> -16:00 @8888 (note)
                                         {% csrf_token %}
                                         <button class="button">これ中心</button>
                                     </form>
+                                </td>
+                                <td>
                                     <form action="{% url 'delete' task.id %}" method="post" class="del_todo">
                                         {% csrf_token %}
                                         <button class="button del">削除</button>
