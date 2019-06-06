@@ -9,8 +9,15 @@ body {
 }
 .task {
     width: 508px;
-    border-top-width: 3px;
+}
+.task.undone{
     background: #ffffcc;
+}
+.task.done{
+    background: #cccccc;
+}
+.task.me{
+    background: #ffff77;
 }
 .task .title {
     height: 30px;
@@ -40,13 +47,6 @@ body {
 .row{
     border-top: 1px solid white;
 }
-.row.out_tasks{
-}
-.task.me{
-    background: #ffff77;
-}
-.row.in_tasks{
-}
 .row_menu{
     width: 70px;
     height: 60px;
@@ -62,6 +62,9 @@ body {
 }
 .row_menu.done{
     background-color: #ccffcc;
+}
+.row_menu.undone{
+    background-color: #cccccc;
 }
 a{
     color: #999999;

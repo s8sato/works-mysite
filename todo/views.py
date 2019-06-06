@@ -13,7 +13,7 @@ import datetime
 class ShowTask(View):
     """"""
     def get(self, req, *args, **kwargs):
-        tasks = Task.objects.all()
+        tasks = Task.objects.filter(is_done=False).all()
         context = {
             'taskss': {
                 'tasks': tasks
@@ -84,15 +84,28 @@ class CreateTask(CreateView):
 add = CreateTask.as_view()
 
 
-class DeleteTask(DeleteView):
+class DoneTask(View):
     """"""
-    def delete(self, req, id=None):
-        task = get_object_or_404(Task, pk=id)
-        task.delete()
+    def get(self, req, id=None):
+        task = Task.objects.get(pk=id)
+        task.is_done = True
+        task.save()
         return HttpResponseRedirect(reverse('index'))
 
 
-delete = DeleteTask.as_view()
+done = DoneTask.as_view()
+
+
+class UndoneTask(View):
+    """"""
+    def get(self, req, id=None):
+        task = Task.objects.get(pk=id)
+        task.is_done = False
+        task.save()
+        return HttpResponseRedirect(reverse('index'))
+
+
+undone = UndoneTask.as_view()
 
 
 class ShowTaskAround1(View):
