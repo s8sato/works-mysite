@@ -13,7 +13,8 @@ import datetime
 class ShowTask(View):
     """"""
     def get(self, req, *args, **kwargs):
-        tasks = Task.objects.filter(is_done=False).all()
+        tasks = Task.objects.all()
+        # tasks = Task.objects.filter(is_done=False).all()
         context = {
             'taskss': {
                 'tasks': tasks
@@ -84,12 +85,28 @@ class CreateTask(CreateView):
 add = CreateTask.as_view()
 
 
+def all_previous(task):
+    yield task
+    previous = [_ for _ in Task.objects.all() if _.terminal_step == task.initial_step]
+    for _ in previous:
+        yield from all_previous(_)
+
+
+def all_following(task):
+    yield task
+    following = [_ for _ in Task.objects.all() if task.terminal_step == _.initial_step]
+    for _ in following:
+        yield from all_following(_)
+
+
 class DoneTask(View):
     """"""
     def get(self, req, id=None):
-        task = Task.objects.get(pk=id)
-        task.is_done = True
-        task.save()
+        this = Task.objects.get(pk=id)
+        # 起点以前のタスクをすべて完了とする
+        for task in all_previous(this):
+            task.is_done = True
+            task.save()
         return HttpResponseRedirect(reverse('index'))
 
 
@@ -99,9 +116,11 @@ done = DoneTask.as_view()
 class UndoneTask(View):
     """"""
     def get(self, req, id=None):
-        task = Task.objects.get(pk=id)
-        task.is_done = False
-        task.save()
+        this = Task.objects.get(pk=id)
+        # 起点以降のタスクをすべて未完了とする
+        for task in all_following(this):
+            task.is_done = False
+            task.save()
         return HttpResponseRedirect(reverse('index'))
 
 

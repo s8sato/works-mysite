@@ -217,6 +217,22 @@ class Sprig:
         # nx.draw_networkx(self.ad, pos=nx.spring_layout(self.ad))
         plt.show()
 
+    # def all_previous(self, edge, ret=None):
+    #     if not ret:
+    #         ret = []
+    #     ret.append(edge)
+    #     previous = [_ for _ in self.ad.edges if _[1] == edge[0]]
+    #     if previous:
+    #         for _ in previous:
+    #             self.all_previous(_, ret)
+    #     return ret
+
+    def all_previous(self, edge):
+        yield edge
+        previous = [_ for _ in self.ad.edges if _[1] == edge[0]]
+        for _ in previous:
+            yield from self.all_previous(_)
+
 
 if __name__ == '__main__':
     omu = """
@@ -246,4 +262,5 @@ if __name__ == '__main__':
     # omu.show_arrow_diagram()
     text = '        head_link] title /21- <d2h4> -/25 @8888 [tail_link'
     sprig = Sprig(omu)
-    print(sprig.ad.in_edges(1))
+    print([_ for _ in sprig.all_previous((12, 2))])
+
