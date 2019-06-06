@@ -21,30 +21,26 @@
         <div id="messageAlt"></div>
         <!-- 固定枠 -->
         <div class="container">
-            <div class="header">
-                <h2 id="title1">Sprig</h2>
+            <div class="header flex">
+                <div id="title">Sprig</div>
                 <!-- メニューボタン群 -->
                 <div class="controller flex">
                     <!-- 新規登録ボタン -->
-                    <form action="{% url 'register' %}" method="post">
-                        {% csrf_token %}
-                        <button class="button">新規登録</button>
-                    </form>
+                    <a href="{% url 'register' %}">
+                        <div class="menu" id="new">New</div>
+                    </a>
                     <!-- すべて表示ボタン -->
-                    <form action="{% url 'index' %}" method="post">
-                        {% csrf_token %}
-                        <button class="button">すべて表示</button>
-                    </form>
+                    <a href="{% url 'index' %}">
+                        <div class="menu" id="all">All</div>
+                    </a>
                     <!-- 最終タスク表示ボタン -->
-                    <form action="{% url 'show_trunk' %}" method="post">
-                        {% csrf_token %}
-                        <button class="button">最終タスク表示</button>
-                    </form>
+                    <a href="{% url 'show_trunk' %}">
+                        <div class="menu" id="trunk">Trunk</div>
+                    </a>
                     <!-- 初動タスク表示ボタン -->
-                    <form action="{% url 'show_buds' %}" method="post">
-                        {% csrf_token %}
-                        <button class="button">初動タスク表示</button>
-                    </form>
+                    <a href="{% url 'show_buds' %}">
+                        <div class="menu" id="buds">Buds</div>
+                    </a>
                 </div>
             </div>
             <div class="main flex">
@@ -54,8 +50,7 @@
                     {% for relationship, tasks in taskss.items %}
                     {% for task in tasks %}
                     <div class="task flex {{ relationship }} {% if not task.is_done %}undone{% else %}done{% endif %}">
-                        <a href="#" onfocus="on_focus(this)" onblur="on_blur(this)">
-                            <div class="description">
+                        <a href="#" class="description" onfocus="on_focus(this)" onblur="on_blur(this)">
                                 <div class="title mg">{{ task.title }}</div>
                                 <div class="attr flex">
                                     <span class="mg">by</span>
@@ -68,7 +63,6 @@
                                     <span class="mg">@</span>
                                     <div>{{ task.client }}</div>
                                 </div>
-                            </div>
                         </a>
                         <!--フォーカスボタン-->
                         <a href="{% url 'show_around_1' task.id %}">
@@ -87,11 +81,11 @@
                         <!--完了/未完了ボタン-->
                         {% if not task.is_done %}
                         <a href="{% url 'done' task.id %}">
-                            <div class="menu done">Done</div>
+                            <div class="menu done done_undone">Done</div>
                         </a>
                         {% else %}
                         <a href="{% url 'undone' task.id %}">
-                            <div class="menu undone">Undone</div>
+                            <div class="menu undone done_undone">Undone</div>
                         </a>
                         {% endif %}
                     </div>
