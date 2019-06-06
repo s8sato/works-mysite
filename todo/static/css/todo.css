@@ -1,11 +1,25 @@
 body {
     background: #fffcf9;
 }
-h2 {
+.header{
+    height: 60px;
+    margin-bottom: 30px;
+}
+.header .menu{
+    background: #cccccc;
+    border-right: 3px solid #fffcf9;
+}
+#title {
+    width: 160px;
     font-size: 50px;
     color: #000000;
     font-weight: 800;
     font-family: Impact;
+    vertical-align: middle;
+}
+.controller{
+    width: 950px;
+    text-align: right;
 }
 .graph{
     width: 400px;
@@ -32,7 +46,7 @@ h2 {
     font-family: 'Monotype Corsiva', 'Courier New';
     font-size: 20px;
 }
-.task .menu {
+.menu {
     width: 70px;
     height: 60px;
     display: table-cell;
