@@ -182,3 +182,31 @@ class ShowRegisterForm(View):
 
 
 register = ShowRegisterForm.as_view()
+
+
+class Breakdown(ShowRegisterForm):
+    """"""
+    def __init__(self):
+        ShowRegisterForm.__init__(self)
+
+        self.default_text = """head_link] task1 :30- <5h30m> -16:00 @8888 (note)
+    task2 /27- <2d4h> -/3 @7777 [tail_link (note)"""
+
+    def get(self, req, id=None):
+        if False:
+            pass
+        # if id:
+        #     task = Task.objects.get(pk=id)
+        #     default_text = task.retext()
+        else:
+            default_text = self.default_text
+        context = {
+            'default_text': default_text
+        }
+        return render(req, 'todo/register.html', context)
+
+    def post(self, req, *args, **kwargs):
+        return HttpResponseRedirect(reverse('breakdown'))
+
+
+breakdown = Breakdown.as_view()

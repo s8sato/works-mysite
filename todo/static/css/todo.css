@@ -7,12 +7,11 @@ h2 {
 body {
     background: #fffcf9;
 }
-td {
+.task {
     border-top-width: 3px;
-    border-top-color: #ffe0c1;
-    background: #fdf5e6;
+    background: #ffffcc;
 }
-.message {
+.title {
     font-size: 20px;
     font-weight: 600;
 }
@@ -41,13 +40,35 @@ td {
     margin-left: 5px;
     margin-right: 5px;
 }
-
-.out_tasks{
-    padding-left: 0px;
+.row{
+    border-top: 1px solid white;
 }
-.me{
-    padding-left: 30px;
+.row.out_tasks{
 }
-.in_tasks{
-    padding-left: 60px;
+.task.me{
+    background: #ffff77;
+}
+.row.in_tasks{
+}
+.task{
+    width: 508px;
+}
+.row_menu{
+    width: 70px;
+    height: 64px;
+    display: table-cell;
+    text-align: center;
+    vertical-align: middle;
+}
+.row_menu.focus{
+    background-color: #ccccff;
+}
+.row_menu.breakdown{
+    background-color: #ffcccc;
+}
+.row_menu.done{
+    background-color: #ccffcc;
+}
+a{
+    color: #999999;
 }

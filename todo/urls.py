@@ -10,4 +10,5 @@ urlpatterns = [
     path('show_buds', views.show_buds, name='show_buds'),
     path('show_trunk', views.show_trunk, name='show_trunk'),
     path('register', views.register, name='register'),
+    path('breakdown/<int:id>', views.breakdown, name='breakdown'),
 ]
