@@ -8,33 +8,30 @@ body {
     background: #fffcf9;
 }
 .task {
+    width: 508px;
     border-top-width: 3px;
     background: #ffffcc;
 }
-.title {
+.task .title {
+    height: 30px;
     font-size: 20px;
     font-weight: 600;
+}
+.task .attr {
+    height: 30px;
+    font-family: 'Monotype Corsiva', 'Courier New';
+    font-size: 20px;
 }
 .button {
     color: #fa8072;
     background: #fffff0;
 }
-.del{
-    color: #a52a2a;
-    background: #ffc0cb;
-}
-
 .flex{
     display: -webkit-flex;
     display: -moz-flex;
     display: -ms-flex;
     display: -o-flex;
     display: flex;
-}
-
-.fft{
-    font-family: 'Monotype Corsiva', 'Courier New';
-    font-size: 20px;
 }
 .mg{
     margin-left: 5px;
@@ -50,12 +47,9 @@ body {
 }
 .row.in_tasks{
 }
-.task{
-    width: 508px;
-}
 .row_menu{
     width: 70px;
-    height: 64px;
+    height: 60px;
     display: table-cell;
     text-align: center;
     vertical-align: middle;
