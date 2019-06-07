@@ -18,6 +18,7 @@ class Line:
         self.indent = 0
         self.body = ''
         self.attrs = {  # attributes
+            'pk': 9999,
             'head_link': '',
             'title': '',
             'start': datetime.datetime.now(),
@@ -33,6 +34,7 @@ class Line:
         self.parent = None
 
         self.parser = {
+            'pk': r'#(\d+)',
             'head_link': r'(.+)\]',
             'start_date': r'(\d{4})?/?(\d{1,2})?/(\d{1,2})-',
             'start_time': r'(\d{1,2})?:(\d{1,2}):?(\d{1,2})?-',
@@ -62,12 +64,14 @@ class Line:
                     self.set_attrs(match_obj, attr)
                     break
             else:
-                self.attrs['title'] += ' {}'.format(word)
+                self.attrs['title'] = ' '.join([self.attrs['title'], word])
         return self.indent, self.attrs
 
     def set_attrs(self, match_obj, attr):
         now = datetime.datetime.now()
-        if attr == 'head_link':
+        if attr == 'pk':
+            self.attrs['pk'] = int(match_obj.group(1))
+        elif attr == 'head_link':
             self.attrs['head_link'] = match_obj.group(1)
         elif attr == 'start_date' or attr == 'deadline_date':
             # 日を決定
@@ -191,6 +195,7 @@ class Sprig:
             # head_linkとtail_linkの間にダミーedge（重み0）を張る
             if line.attrs['head_link']:
                 dummy_attrs = {
+                    'pk': None,
                     'head_link': '',
                     'title': 'dummy',
                     'start': datetime.datetime.now(),

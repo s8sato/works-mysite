@@ -35,35 +35,49 @@ class CreateTask(CreateView):
         # 入力テキストを有向グラフ構造をもったSprigインスタンスに変換する
         sprig = Sprig(req.POST['sprig'])
 
-        # sprigのnodeを調べてstepを登録
         node2step = {}
-        for node in sprig.ad.nodes:
-            # 既存のnodeを指すか調べ、そうでなければ新しく作る
-            try:
-                step = Step.objects.get(pk=int(sprig.ad.nodes[node]['linker']))
-            except Step.DoesNotExist:
-                step = Step()
-                step.save()
-            except ValueError:
-                step = Step()
-                step.save()
-            # node番号（一時的）とstep.pk（永続的）との対応をとる
-            node2step[node] = step.pk
-
-        # sprigのedgeを調べてtaskを登録
-        is_new_task = False
+        new_edges = list(sprig.ad.edges)
+        # 既存のtaskに相当するedgeを調べ上げ
         for edge in sprig.ad.edges:
-            # 既存のedgeを指すか調べ、そうでなければ新しく作る
             try:
-                task = Task.objects.get(
-                    initial_step=Step.objects.get(pk=node2step[edge[0]]),
-                    terminal_step=Step.objects.get(pk=node2step[edge[1]])
-                )
+                task = Task.objects.get(pk=sprig.ad.edges[edge]['pk'])
+                # nodeとstepの対応をとる
+                node2step[edge[0]] = task.initial_step.pk
+                node2step[edge[1]] = task.terminal_step.pk
+                # 新規にtaskとして登録する候補から外す
+                new_edges.remove(edge)
             except Task.DoesNotExist:
-                task = Task()
-                is_new_task = True
+                pass
 
-            # 値を更新、または新しく設定
+        # 既存のtaskに相当しないedgeについて
+        for edge in new_edges:
+            # 両端のnodeに対応するstepを用意
+            try:
+                initial_step = Step.objects.get(pk=node2step[edge[0]])
+            except Step.DoesNotExist:
+                initial_step = Step()
+            except KeyError:
+                initial_step = Step()
+            finally:
+                initial_step.save()
+                node2step[edge[0]] = initial_step.pk
+            try:
+                terminal_step = Step.objects.get(pk=node2step[edge[1]])
+            except Step.DoesNotExist:
+                terminal_step = Step()
+            except KeyError:
+                terminal_step = Step()
+            finally:
+                terminal_step.save()
+                node2step[edge[1]] = terminal_step.pk
+
+        # taskを登録、または更新
+        for edge in sprig.ad.edges:
+            if edge in new_edges:
+                task = Task()
+            else:
+                task = Task.objects.get(pk=sprig.ad.edges[edge]['pk'])
+
             task.title = sprig.ad.edges[edge]['title']
             task.start = sprig.ad.edges[edge]['start']
             task.expected_time = sprig.ad.edges[edge]['expected_time']
@@ -75,9 +89,7 @@ class CreateTask(CreateView):
             task.initial_step = Step.objects.get(pk=node2step[edge[0]])
             task.terminal_step = Step.objects.get(pk=node2step[edge[1]])
 
-            if is_new_task:
-                task.save()
-                is_new_task = False
+            task.save()
 
         return HttpResponseRedirect(reverse('index'))
 
@@ -225,11 +237,11 @@ class Breakdown(ShowRegisterForm):
     task2 /27- <2d4h> -/3 @7777 [tail_link (note)"""
 
     def get(self, req, id=None):
-        if False:
-            pass
-        # if id:
-        #     task = Task.objects.get(pk=id)
-        #     default_text = task.retext()
+        # if False:
+        #     pass
+        if id:
+            task = Task.objects.get(pk=id)
+            default_text = task.restring()
         else:
             default_text = self.default_text
         context = {
