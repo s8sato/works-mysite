@@ -13,7 +13,7 @@ import datetime
 class ShowTask(View):
     """"""
     def get(self, req, *args, **kwargs):
-        tasks = Task.objects.all()
+        tasks = Task.objects.exclude(title='dummy').all()
         # tasks = Task.objects.filter(is_done=False).all()
         context = {
             'taskss': {
@@ -142,6 +142,7 @@ undone = UndoneTask.as_view()
 class ShowTaskAround1(View):
     """"""
     def get(self, req, id=None):
+        # あとでforにかける関係上iterableにとる
         me = Task.objects.filter(pk=id).all()
         _me = me.get()
         initial = Step.objects.get(pk=_me.initial_step.pk)
