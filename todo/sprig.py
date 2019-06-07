@@ -18,7 +18,7 @@ class Line:
         self.indent = 0
         self.body = ''
         self.attrs = {  # attributes
-            'pk': 9999,
+            'pk': None,
             'head_link': '',
             'title': '',
             'start': datetime.datetime.now(),
@@ -188,11 +188,8 @@ class Sprig:
             initial = line.id
             terminal = line.parent.id if line.parent else line.id - len(self.lines)
             self.ad.add_edge(initial, terminal, **line.attrs)
-            # edgeを張ったことにより自動生成されたnodeを初期化
-            self.ad.nodes[initial]['linker'] = ''
-            self.ad.nodes[terminal]['linker'] = ''
 
-            # head_linkとtail_linkの間にダミーedge（重み0）を張る
+            # head_linkからtail_linkへダミーedge（重み0）を張る
             if line.attrs['head_link']:
                 dummy_attrs = {
                     'pk': None,
@@ -211,9 +208,6 @@ class Sprig:
                     initial = line.parent.id
                     terminal = tail.id
                     self.ad.add_edge(initial, terminal, **dummy_attrs)
-
-                # linkerをhead_linkから継承
-                self.ad.nodes[terminal]['linker'] = line.attrs['head_link']
 
     def show_arrow_diagram(self):
         # nx.draw_networkx(self.ad, pos=nx.circular_layout(self.ad))

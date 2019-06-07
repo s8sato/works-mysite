@@ -237,8 +237,6 @@ class Breakdown(ShowRegisterForm):
     task2 /27- <2d4h> -/3 @7777 [tail_link (note)"""
 
     def get(self, req, id=None):
-        # if False:
-        #     pass
         if id:
             task = Task.objects.get(pk=id)
             default_text = task.restring()
