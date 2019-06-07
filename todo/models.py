@@ -1,5 +1,9 @@
 from django.db import models
 import datetime
+from pytz import timezone
+import sys
+sys.path.append('..')
+from mysite import settings
 
 
 class Step(models.Model):
@@ -50,8 +54,8 @@ class Task(models.Model):
         return ' '.join([
             r'#' + str(self.pk),
             self.title,
-            self.start.strftime('%Y/%m/%d') + r'-',
-            self.start.strftime('%H:%M:%S') + r'-',
+            self.start.astimezone(timezone(settings.TIME_ZONE)).strftime('%Y/%m/%d') + r'-',
+            self.start.astimezone(timezone(settings.TIME_ZONE)).strftime('%H:%M:%S') + r'-',
             r'<' +
             # str(self.expected_time.weeks) + r'w' +
             str(self.expected_time.days) + r'd' +
@@ -59,8 +63,8 @@ class Task(models.Model):
             # str(self.expected_time.minutes) + r'm' +
             str(self.expected_time.seconds) + r's'
             + r'>',
-            r'-' + self.deadline.strftime('%Y/%m/%d'),
-            r'-' + self.deadline.strftime('%H:%M:%S'),
+            r'-' + self.deadline.astimezone(timezone(settings.TIME_ZONE)).strftime('%Y/%m/%d'),
+            r'-' + self.deadline.astimezone(timezone(settings.TIME_ZONE)).strftime('%H:%M:%S'),
             r'@' + str(self.client),
             r'(' + str(self.note) + r')'
         ])
