@@ -77,17 +77,13 @@ class Line:
             # 日を決定
             day = int(match_obj.group(3))
             # 月を決定
-            if not match_obj.group(2) and now.day <= day:
+            if not match_obj.group(2):
                 month = now.month
-            elif not match_obj.group(2) and day < now.day:
-                month = now.month + 1
             else:
                 month = int(match_obj.group(2))
             # 年を決定
-            if not match_obj.group(1) and now. month <= month:
+            if not match_obj.group(1):
                 year = now.year
-            elif not match_obj.group(1) and month < now. month:
-                year = now.year + 1
             else:
                 year = int(match_obj.group(1))
             # 新しいdatetimeオブジェクトに置き換える
@@ -106,10 +102,8 @@ class Line:
             # 分を決定
             minute = int(match_obj.group(2) or 0)
             # 時を決定
-            if not match_obj.group(1) and now. minute <= minute:
+            if not match_obj.group(1):
                 hour = now.hour
-            elif not match_obj.group(1) and minute < now. minute:
-                hour = now.hour + 1
             else:
                 hour = int(match_obj.group(1))
             # 新しいdatetimeオブジェクトに置き換える
