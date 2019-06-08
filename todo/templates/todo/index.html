@@ -44,8 +44,11 @@
                 </div>
             </div>
             <div class="main flex">
-                <div class="graph">graph</div>
-                <div class="tasks">
+                <div class="fix">
+                    <div id="graph">graph</div>
+                    <div id="note">note</div>
+                </div>
+                <div id="tasks">
                     <!-- for文回してtodoを取得、表示 -->
                     {% for relationship, tasks in taskss.items %}
                     {% for task in tasks %}
@@ -62,6 +65,7 @@
                                     <span class="mg">)</span>
                                     <span class="mg">@</span>
                                     <div>{{ task.client }}</div>
+                                    <div class="note">{{ task.note }}</div>
                                 </div>
                         </a>
                         <!--フォーカスボタン-->

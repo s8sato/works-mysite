@@ -46,10 +46,14 @@ function select_description() {
     if(event.key === 'j' && active_row < links_description.length){  // jで下へ移動
         active_row ++;
         links_description[active_row].focus();
+        note = document.getElementById('note')
+        note.innerHTML = notes[active_row].innerHTML
     }
     if(event.key === 'k' && 0 < active_row){  // kで上へ移動
         active_row --;
         links_description[active_row].focus();
+        note = document.getElementById('note')
+        note.innerHTML = notes[active_row].innerHTML
     }
 }
 
@@ -121,6 +125,7 @@ let
     links_focus = document.getElementsByClassName('focus'),
     links_breakdown = document.getElementsByClassName('breakdown'),
     links_done_undone = document.getElementsByClassName('done_undone'),
+    notes = document.getElementsByClassName('note'),
     active_row = 0;
 
 if (textarea != null){
