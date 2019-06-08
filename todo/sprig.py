@@ -18,6 +18,7 @@ class Line:
         self.indent = 0
         self.body = ''
         self.attrs = {  # attributes
+            'pk': None,
             'head_link': '',
             'title': '',
             'start': datetime.datetime.now(),
@@ -33,6 +34,7 @@ class Line:
         self.parent = None
 
         self.parser = {
+            'pk': r'#(\d+)',
             'head_link': r'(.+)\]',
             'start_date': r'(\d{4})?/?(\d{1,2})?/(\d{1,2})-',
             'start_time': r'(\d{1,2})?:(\d{1,2}):?(\d{1,2})?-',
@@ -62,28 +64,26 @@ class Line:
                     self.set_attrs(match_obj, attr)
                     break
             else:
-                self.attrs['title'] += ' {}'.format(word)
+                self.attrs['title'] = ' '.join([self.attrs['title'], word])
         return self.indent, self.attrs
 
     def set_attrs(self, match_obj, attr):
         now = datetime.datetime.now()
-        if attr == 'head_link':
+        if attr == 'pk':
+            self.attrs['pk'] = int(match_obj.group(1))
+        elif attr == 'head_link':
             self.attrs['head_link'] = match_obj.group(1)
         elif attr == 'start_date' or attr == 'deadline_date':
             # 日を決定
             day = int(match_obj.group(3))
             # 月を決定
-            if not match_obj.group(2) and now.day <= day:
+            if not match_obj.group(2):
                 month = now.month
-            elif not match_obj.group(2) and day < now.day:
-                month = now.month + 1
             else:
                 month = int(match_obj.group(2))
             # 年を決定
-            if not match_obj.group(1) and now. month <= month:
+            if not match_obj.group(1):
                 year = now.year
-            elif not match_obj.group(1) and month < now. month:
-                year = now.year + 1
             else:
                 year = int(match_obj.group(1))
             # 新しいdatetimeオブジェクトに置き換える
@@ -102,10 +102,8 @@ class Line:
             # 分を決定
             minute = int(match_obj.group(2) or 0)
             # 時を決定
-            if not match_obj.group(1) and now. minute <= minute:
+            if not match_obj.group(1):
                 hour = now.hour
-            elif not match_obj.group(1) and minute < now. minute:
-                hour = now.hour + 1
             else:
                 hour = int(match_obj.group(1))
             # 新しいdatetimeオブジェクトに置き換える
@@ -184,13 +182,11 @@ class Sprig:
             initial = line.id
             terminal = line.parent.id if line.parent else line.id - len(self.lines)
             self.ad.add_edge(initial, terminal, **line.attrs)
-            # edgeを張ったことにより自動生成されたnodeを初期化
-            self.ad.nodes[initial]['linker'] = ''
-            self.ad.nodes[terminal]['linker'] = ''
 
-            # head_linkとtail_linkの間にダミーedge（重み0）を張る
+            # head_linkからtail_linkへダミーedge（重み0）を張る
             if line.attrs['head_link']:
                 dummy_attrs = {
+                    'pk': None,
                     'head_link': '',
                     'title': 'dummy',
                     'start': datetime.datetime.now(),
@@ -207,15 +203,28 @@ class Sprig:
                     terminal = tail.id
                     self.ad.add_edge(initial, terminal, **dummy_attrs)
 
-                # linkerをhead_linkから継承
-                self.ad.nodes[terminal]['linker'] = line.attrs['head_link']
-
     def show_arrow_diagram(self):
         # nx.draw_networkx(self.ad, pos=nx.circular_layout(self.ad))
         nx.draw_networkx(self.ad, pos=nx.shell_layout(self.ad))
         # nx.draw_networkx(self.ad, pos=nx.spectral_layout(self.ad))
         # nx.draw_networkx(self.ad, pos=nx.spring_layout(self.ad))
         plt.show()
+
+    # def all_previous(self, edge, ret=None):
+    #     if not ret:
+    #         ret = []
+    #     ret.append(edge)
+    #     previous = [_ for _ in self.ad.edges if _[1] == edge[0]]
+    #     if previous:
+    #         for _ in previous:
+    #             self.all_previous(_, ret)
+    #     return ret
+
+    def all_previous(self, edge):
+        yield edge
+        previous = [_ for _ in self.ad.edges if _[1] == edge[0]]
+        for _ in previous:
+            yield from self.all_previous(_)
 
 
 if __name__ == '__main__':
@@ -246,4 +255,5 @@ if __name__ == '__main__':
     # omu.show_arrow_diagram()
     text = '        head_link] title /21- <d2h4> -/25 @8888 [tail_link'
     sprig = Sprig(omu)
-    print(sprig.ad.in_edges(1))
+    print([_ for _ in sprig.all_previous((12, 2))])
+

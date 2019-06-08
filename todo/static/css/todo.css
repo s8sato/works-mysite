@@ -1,30 +1,82 @@
-h2 {
+body {
+    background: #fffcf9;
+}
+.header{
+    height: 60px;
+    margin-bottom: 30px;
+}
+.header .menu{
+    background: #cccccc;
+    border-right: 3px solid #fffcf9;
+}
+#title {
+    width: 160px;
     font-size: 50px;
     color: #000000;
     font-weight: 800;
     font-family: Impact;
+    vertical-align: middle;
 }
-body {
-    background: #fffcf9;
+.controller{
+    width: 950px;
+    text-align: right;
 }
-td {
-    border-top-width: 3px;
-    border-top-color: #ffe0c1;
-    background: #fdf5e6;
+.graph{
+    width: 400px;
+    height: 600px;
+    border: 1px solid red;
 }
-.message {
+.tasks{
+    width: 710px;
+}
+.task{
+    border-top: 1px solid white;
+}
+.task .description {
+    width: 508px;
+    padding-left: 10px;
+}
+.task .description .title {
+    height: 30px;
     font-size: 20px;
     font-weight: 600;
+}
+.task .description .attr {
+    height: 30px;
+    font-family: 'Monotype Corsiva', 'Courier New';
+    font-size: 20px;
+}
+.menu {
+    width: 70px;
+    height: 60px;
+    display: table-cell;
+    text-align: center;
+    vertical-align: middle;
+}
+.done{
+    background: #cccccc;
+}
+.undone{
+    background: #ffffcc;
+}
+.focus{
+    background: #ccccff;
+}
+.undone .breakdown{
+    background: #ccffcc;
+}
+.undone .done{
+    background: #ffcccc;
+}
+
+
+.me{
+    background: #ffff77;
 }
 .button {
     color: #fa8072;
     background: #fffff0;
 }
-.del{
-    color: #a52a2a;
-    background: #ffc0cb;
-}
-
 .flex{
     display: -webkit-flex;
     display: -moz-flex;
@@ -32,22 +84,10 @@ td {
     display: -o-flex;
     display: flex;
 }
-
-.fft{
-    font-family: 'Monotype Corsiva', 'Courier New';
-    font-size: 20px;
-}
 .mg{
     margin-left: 5px;
     margin-right: 5px;
 }
-
-.out_tasks{
-    padding-left: 0px;
-}
-.me{
-    padding-left: 30px;
-}
-.in_tasks{
-    padding-left: 60px;
+a{
+    color: #999999;
 }

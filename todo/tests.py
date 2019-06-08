@@ -4,10 +4,8 @@ from django.test import TestCase
 
 import datetime
 
-ze = datetime.datetime(2019, 6, 26)
+ze = datetime.datetime(2019, 6, 26, 12)
 
-fo  = ze + datetime.timedelta(weeks=20)
-
-ei  = fo + datetime.timedelta(weeks=20)
+fo = ze.strftime('%H')
 
 pass
