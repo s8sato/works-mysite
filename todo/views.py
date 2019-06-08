@@ -13,7 +13,7 @@ import datetime
 class ShowTask(View):
     """"""
     def get(self, req, *args, **kwargs):
-        tasks = Task.objects.exclude(title='dummy').all()
+        tasks = Task.objects.exclude(title='dummy').order_by('is_done', 'deadline').all()
         # tasks = Task.objects.filter(is_done=False).all()
         context = {
             'taskss': {
