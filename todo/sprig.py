@@ -21,10 +21,10 @@ class Line:
             'pk': None,
             'head_link': '',
             'title': '',
-            'start': datetime.datetime.now(),
-            'expected_time': datetime.timedelta(),
+            'start': None,
+            'expected_time': None,
             'actual_time': datetime.timedelta(),
-            'deadline': datetime.datetime.now(),
+            'deadline': None,
             'client': 0,  # todo idではなくUserインスタンスに
             'tail_link': '',
             'is_done': False,
@@ -37,10 +37,10 @@ class Line:
             'pk': r'#(\d+)',
             'head_link': r'(.+)\]',
             'start_date': r'(\d{4})?/?(\d{1,2})?/(\d{1,2})-',
-            'start_time': r'(\d{1,2})?:(\d{1,2}):?(\d{1,2})?-',
+            'start_time': r'(\d{1,2})?:(\d{1,2})?:?(\d{1,2})?-',
             'expected_time': r'<((\d+)w)?((\d+)d)?((\d+)h)?((\d+)m)?((\d+)s)?>',
             'deadline_date': r'-(\d{4})?/?(\d{1,2})?/(\d{1,2})',
-            'deadline_time': r'-(\d{1,2})?:(\d{1,2}):?(\d{1,2})?',
+            'deadline_time': r'-(\d{1,2})?:(\d{1,2})?:?(\d{1,2})?',
             'client': r'@(\d+)',
             'tail_link': r'\[(.+)',
             'note': r'\((.+)\)',
@@ -93,8 +93,12 @@ class Line:
                 'year': year,
             }
             if attr == 'start_date':
+                if self.attrs['start'] is None:
+                    self.attrs['start'] = datetime.datetime.now()
                 self.attrs['start'] = self.attrs['start'].replace(**replacement)
             else:
+                if self.attrs['deadline'] is None:
+                    self.attrs['deadline'] = datetime.datetime.now()
                 self.attrs['deadline'] = self.attrs['deadline'].replace(**replacement)
         elif attr == 'start_time' or attr == 'deadline_time':
             # 秒を決定
@@ -113,11 +117,15 @@ class Line:
                 'hour': hour,
             }
             if attr == 'start_time':
+                if self.attrs['start'] is None:
+                    self.attrs['start'] = datetime.datetime.now()
                 self.attrs['start'] = self.attrs['start'].replace(**replacement)
             else:
+                if self.attrs['deadline'] is None:
+                    self.attrs['deadline'] = datetime.datetime.now()
                 self.attrs['deadline'] = self.attrs['deadline'].replace(**replacement)
         elif attr == 'expected_time':
-            self.attrs['expected_time'] += datetime.timedelta(
+            self.attrs['expected_time'] = datetime.timedelta(
                 weeks=int(match_obj.group(2) or 0),
                 days=int(match_obj.group(4) or 0),
                 hours=int(match_obj.group(6) or 0),
@@ -130,7 +138,7 @@ class Line:
             self.attrs['tail_link'] = match_obj.group(1)
         elif attr == 'note':
             self.attrs['note'] = match_obj.group(1)
-
+            
 
 class Sprig:
     """複数行テキストを解析して有向グラフ構造をもたせたもの"""
@@ -138,6 +146,7 @@ class Sprig:
         self.lines = [Line(i, string) for i, string in enumerate(text.splitlines())]
         self.set_descendants()
         self.set_parent()
+        self.set_default_attrs()
         self.ad = nx.DiGraph()  # arrow_diagram
         self.set_arrow_diagram()
 
@@ -166,6 +175,26 @@ class Sprig:
                 return above_line
         else:
             return line.id - len(self.lines)
+
+    def set_default_attrs(self):
+        for line in self.lines:
+            if line.attrs['start'] is None:
+                try:
+                    line.attrs['start'] = line.parent.attrs['start']
+                except AttributeError:
+                    line.attrs['start'] = datetime.datetime.now()
+            if line.attrs['expected_time'] is None:
+                line.attrs['expected_time'] = datetime.timedelta()
+                for descendant in line.descendants:
+                    try:
+                        line.attrs['expected_time'] += descendant.attrs['expected_time']
+                    except AttributeError:
+                        line.attrs['expected_time'] += datetime.timedelta(hours=1)
+            if line.attrs['deadline'] is None:
+                try:
+                    line.attrs['deadline'] = line.parent.attrs['deadline']
+                except AttributeError:
+                    line.attrs['deadline'] = datetime.datetime.now()
 
     # def show(self):
     #     print('\n'.join([INDENT * line.indent + line.attrs.values() for line in self.lines]))

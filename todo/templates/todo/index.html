@@ -59,12 +59,10 @@
                                     <span class="mg">by</span>
                                     <div class="number">{{ task.deadline|date:"Y-m-d D H:i:s" }}</div>
                                     <span class="mg">(</span>
-                                    <div class="number">{{ task.actual_time }}</div>
-                                    <span class="mg">/</span>
                                     <div class="number">{{ task.expected_time }}</div>
                                     <span class="mg">)</span>
-                                    <span class="mg">@</span>
-                                    <div>{{ task.client }}</div>
+                                    <span class="mg">from</span>
+                                    <div class="number">{{ task.start|date:"Y-m-d D H:i:s" }}</div>
                                     <div class="note">{{ task.note }}</div>
                                 </div>
                         </a>

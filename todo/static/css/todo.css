@@ -55,7 +55,7 @@ body {
 .task .description .attr {
     height: 30px;
     font-family: 'Monotype Corsiva', 'Courier New';
-    font-size: 20px;
+    font-size: 16px;
 }
 .note{
     display: none;
