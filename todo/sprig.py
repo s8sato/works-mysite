@@ -167,10 +167,10 @@ class Sprig:
         for line in self.lines[::-1]:
             # note行なら蓄積し、
             if line.is_note:
-                note.append(' '.join(line.words[1:]))  # 行頭記号を除く
+                note.append(' '.join(line.words))
             # 非note行なら蓄積を反映する
             else:
-                line.attrs['note'] = '\n\n'.join(note[::-1])
+                line.attrs['note'] += '\n'.join(note[::-1])
                 note = []
         self.lines = [_ for _ in self.lines if not _.is_note]
 
