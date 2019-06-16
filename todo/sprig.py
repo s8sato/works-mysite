@@ -17,12 +17,11 @@ class Line:
         'head_link': r'(.+)\]',
         'start_date': r'(\d{4})?/?(\d{1,2})?/(\d{1,2})-',
         'start_time': r'(\d{1,2})?:(\d{1,2})?:?(\d{1,2})?-',
-        'expected_time': r'<((\d+)w)?((\d+)d)?((\d+)h)?((\d+)m)?((\d+)s)?>',
+        'expected_time': r'\(((\d+)w)?((\d+)d)?((\d+)h)?((\d+)m)?((\d+)s)?\)',
         'deadline_date': r'-(\d{4})?/?(\d{1,2})?/(\d{1,2})',
         'deadline_time': r'-(\d{1,2})?:(\d{1,2})?:?(\d{1,2})?',
         'client': r'@(\d+)',
         'tail_link': r'\[(.+)',
-        'note': r'\((.+)\)',
     }
 
     def __init__(self, id, string):
@@ -149,8 +148,6 @@ class Line:
             self.attrs['client'] = int(match_obj.group(1))
         elif attr == 'tail_link':
             self.attrs['tail_link'] = match_obj.group(1)
-        elif attr == 'note':
-            self.attrs['note'] = match_obj.group(1)
             
 
 class Sprig:
