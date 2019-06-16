@@ -157,7 +157,7 @@ class Sprig:
     """複数行テキストを解析して有向グラフ構造をもたせたもの"""
     def __init__(self, text):
         self.lines = [Line(i, string) for i, string in enumerate(text.splitlines())]
-        # self.set_notes()
+        self.set_notes()
         self.set_descendants()
         self.set_parent()
         self.set_default_attrs()
@@ -165,16 +165,17 @@ class Sprig:
         self.set_arrow_diagram()
 
     def set_notes(self):
-        # すべての非note行について、次の非note行までの行をnoteに追加する
-        for line in filter(lambda x: not x.is_note, self.lines):
-            note = []
-            # while(1):
-            #     note.append(' '.join(line.words[1:]))
-
-
-        # すべてのnote行を削除する
-
-        return 1
+        note = []
+        # すべての行を逆順に調べ、
+        for line in self.lines[::-1]:
+            # note行なら蓄積し、
+            if line.is_note:
+                note.append(' '.join(line.words[1:]))  # 行頭記号を除く
+            # 非note行なら蓄積を反映する
+            else:
+                line.attrs['note'] = '\n\n'.join(note[::-1])
+                note = []
+        self.lines = [_ for _ in self.lines if not _.is_note]
 
     def set_descendants(self):
         for line in self.lines:
