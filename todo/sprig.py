@@ -12,11 +12,25 @@ INDENT = "    "
 class Line:
     """行について納期や親子関係などの解析を済ませたもの"""
 
+    parser = {
+        'pk': r'#(\d+)',
+        'head_link': r'(.+)\]',
+        'start_date': r'(\d{4})?/?(\d{1,2})?/(\d{1,2})-',
+        'start_time': r'(\d{1,2})?:(\d{1,2})?:?(\d{1,2})?-',
+        'expected_time': r'<((\d+)w)?((\d+)d)?((\d+)h)?((\d+)m)?((\d+)s)?>',
+        'deadline_date': r'-(\d{4})?/?(\d{1,2})?/(\d{1,2})',
+        'deadline_time': r'-(\d{1,2})?:(\d{1,2})?:?(\d{1,2})?',
+        'client': r'@(\d+)',
+        'tail_link': r'\[(.+)',
+        'note': r'\((.+)\)',
+    }
+
     def __init__(self, id, string):
         self.id = id
         self.string = string
         self.indent = 0
-        self.body = ''
+        self.words = []
+        self.is_note = False
         self.attrs = {  # attributes
             'pk': None,
             'head_link': '',
@@ -33,41 +47,40 @@ class Line:
         self.descendants = []
         self.parent = None
 
-        self.parser = {
-            'pk': r'#(\d+)',
-            'head_link': r'(.+)\]',
-            'start_date': r'(\d{4})?/?(\d{1,2})?/(\d{1,2})-',
-            'start_time': r'(\d{1,2})?:(\d{1,2})?:?(\d{1,2})?-',
-            'expected_time': r'<((\d+)w)?((\d+)d)?((\d+)h)?((\d+)m)?((\d+)s)?>',
-            'deadline_date': r'-(\d{4})?/?(\d{1,2})?/(\d{1,2})',
-            'deadline_time': r'-(\d{1,2})?:(\d{1,2})?:?(\d{1,2})?',
-            'client': r'@(\d+)',
-            'tail_link': r'\[(.+)',
-            'note': r'\((.+)\)',
-        }
         self.parse()
 
     def parse(self):
         """行を解析し属性値を設定する"""
-        # 行をインデントと本文に分ける
+        NOTE_HEAD = r'+'
+        self.string2indent_words()
+        # note行には目印をつけるだけ
+        if self.words[0] == NOTE_HEAD:
+            self.is_note = True
+        else:
+            self.words2attrs()
+
+    def string2indent_words(self):
+        """行をインデントと単語群に分ける"""
         match_obj = re.search(r'^(({})*)(.*)$'.format(INDENT), self.string)
         if match_obj:
             self.indent = match_obj.group(1).count(INDENT) or 0
-            self.body = match_obj.group(3)
-        # 本文を単語に分ける
-        words = self.body.split(' ')
-        for word in words:
+            self.words = match_obj.group(3).split(' ')
+        return self.indent, self.words
+
+    def words2attrs(self):
+        """単語群から属性値（タイトル、期限など）を設定する"""
+        for word in self.words:
             # 単語が属性を表していれば属性値を設定し、そうでなければtitleに含める
             for attr in self.parser.keys():
                 match_obj = re.search(self.parser[attr], word)
                 if match_obj:
-                    self.set_attrs(match_obj, attr)
+                    self.set_attr(match_obj, attr)
                     break
             else:
-                self.attrs['title'] = ' '.join([self.attrs['title'], word])
-        return self.indent, self.attrs
+                self.attrs['title'] = ' '.join([self.attrs['title'], word]).strip()
+        return self.attrs
 
-    def set_attrs(self, match_obj, attr):
+    def set_attr(self, match_obj, attr):
         now = datetime.datetime.now()
         if attr == 'pk':
             self.attrs['pk'] = int(match_obj.group(1))
@@ -144,11 +157,24 @@ class Sprig:
     """複数行テキストを解析して有向グラフ構造をもたせたもの"""
     def __init__(self, text):
         self.lines = [Line(i, string) for i, string in enumerate(text.splitlines())]
+        # self.set_notes()
         self.set_descendants()
         self.set_parent()
         self.set_default_attrs()
         self.ad = nx.DiGraph()  # arrow_diagram
         self.set_arrow_diagram()
+
+    def set_notes(self):
+        # すべての非note行について、次の非note行までの行をnoteに追加する
+        for line in filter(lambda x: not x.is_note, self.lines):
+            note = []
+            # while(1):
+            #     note.append(' '.join(line.words[1:]))
+
+
+        # すべてのnote行を削除する
+
+        return 1
 
     def set_descendants(self):
         for line in self.lines:
@@ -183,21 +209,25 @@ class Sprig:
                     line.attrs['start'] = line.parent.attrs['start']
                 except AttributeError:
                     line.attrs['start'] = datetime.datetime.now()
-            if line.attrs['expected_time'] is None:
-                line.attrs['expected_time'] = datetime.timedelta()
-                for descendant in line.descendants:
-                    try:
-                        line.attrs['expected_time'] += descendant.attrs['expected_time']
-                    except AttributeError:
-                        line.attrs['expected_time'] += datetime.timedelta(hours=1)
             if line.attrs['deadline'] is None:
                 try:
                     line.attrs['deadline'] = line.parent.attrs['deadline']
                 except AttributeError:
                     line.attrs['deadline'] = datetime.datetime.now()
+        for line in self.lines[::-1]:
+            if line.attrs['expected_time'] is None:
+                line.attrs['expected_time'] = datetime.timedelta()
 
-    # def show(self):
-    #     print('\n'.join([INDENT * line.indent + line.attrs.values() for line in self.lines]))
+                for descendant in line.descendants:
+                    try:
+                        line.attrs['expected_time'] += descendant.attrs['expected_time']
+                    except AttributeError:
+                        line.attrs['expected_time'] += datetime.timedelta(hours=1)
+
+    def show(self):
+        print('\n'.join([INDENT * line.indent +
+                         ' '.join(map(lambda x: str(x), line.attrs.values()))
+                         for line in self.lines]))
 
     def get_head(self, line):
         return [_ for _ in self.lines if _.attrs['head_link'] == line.attrs['tail_link']]
@@ -279,10 +309,9 @@ if __name__ == '__main__':
     成形したチキンライスに卵ドレスを乗せる
         チキンライスを茶碗で成形して皿に盛る
 """
-    # omu = Sprig(omu)
-    # # omu.show()
+    omu = Sprig(omu)
+    omu.show()
     # omu.show_arrow_diagram()
-    text = '        head_link] title /21- <d2h4> -/25 @8888 [tail_link'
-    sprig = Sprig(omu)
-    print([_ for _ in sprig.all_previous((12, 2))])
+    # sprig = Sprig(omu)
+    # print([_ for _ in sprig.all_previous((12, 2))])
 
