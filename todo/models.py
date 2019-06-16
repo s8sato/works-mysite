@@ -51,7 +51,7 @@ class Task(models.Model):
         return u"{0}:{1}... ".format(self.pk, self.title[:10])
 
     def restring(self):
-        return ' '.join([
+        main = ' '.join([
             r'#' + str(self.pk),
             self.title,
             self.start.astimezone(timezone(settings.TIME_ZONE)).strftime('%Y/%m/%d') + r'-',
@@ -67,3 +67,5 @@ class Task(models.Model):
             r'-' + self.deadline.astimezone(timezone(settings.TIME_ZONE)).strftime('%H:%M:%S'),
             r'@' + str(self.client),
         ])
+        string = '\n'.join([main, self.note])
+        return string
