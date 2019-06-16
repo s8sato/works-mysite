@@ -213,8 +213,8 @@ show_trunk = ShowTaskTrunk.as_view()
 class ShowRegisterForm(View):
     """"""
 
-    DEFAULT_TEXT = """head_link] task1 :30- <5h30m> -16:00 @8888 (note)
-    task2 /27- <2d4h> -/3 @7777 [tail_link (note)"""
+    DEFAULT_TEXT = """head_link] task1 :30- (5h30m) -16:00 @8888
+    task2 /27- (2d4h) -/3 @7777 [tail_link"""
 
     def get(self, req, default_text=DEFAULT_TEXT):
         context = {
@@ -234,8 +234,8 @@ class Breakdown(ShowRegisterForm):
     def __init__(self):
         ShowRegisterForm.__init__(self)
 
-        self.default_text = """head_link] task1 :30- <5h30m> -16:00 @8888 (note)
-    task2 /27- <2d4h> -/3 @7777 [tail_link (note)"""
+        self.default_text = """head_link] task1 :30- (5h30m) -16:00 @8888
+    task2 /27- (2d4h) -/3 @7777 [tail_link"""
 
     def get(self, req, id=None):
         if id:
