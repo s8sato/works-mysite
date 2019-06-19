@@ -1,0 +1,5 @@
+certifi==2019.3.9
+decorator==4.4.0
+Django==2.0
+networkx==2.3
+pytz==2019.1
