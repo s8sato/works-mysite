@@ -13,7 +13,6 @@ class Line:
     """行について納期や親子関係などの解析を済ませたもの"""
 
     parser = {
-        'pk': r'#(\d+)',
         'head_link': r'(.+)\]',
         'start_date': r'(\d{4})?/?(\d{1,2})?/(\d{1,2})-',
         'start_time': r'(\d{1,2})?:(\d{1,2})?:?(\d{1,2})?-',
@@ -59,11 +58,13 @@ class Line:
             self.words2attrs()
 
     def string2indent_words(self):
-        """行をインデントと単語群に分ける"""
-        match_obj = re.search(r'^(({})*)(.*)$'.format(INDENT), self.string)
+        """行をインデントと主キーと単語群に分ける"""
+        match_obj = re.search(r'^(({})*)(#(\d+))?(.*)$'.format(INDENT), self.string)
         if match_obj:
             self.indent = match_obj.group(1).count(INDENT) or 0
-            self.words = match_obj.group(3).split(' ')
+            if match_obj.group(4):
+                self.attrs['pk'] = int(match_obj.group(4))
+            self.words = match_obj.group(5).split(' ')
         return self.indent, self.words
 
     def words2attrs(self):
@@ -81,9 +82,7 @@ class Line:
 
     def set_attr(self, match_obj, attr):
         now = datetime.datetime.now()
-        if attr == 'pk':
-            self.attrs['pk'] = int(match_obj.group(1))
-        elif attr == 'head_link':
+        if attr == 'head_link':
             self.attrs['head_link'] = match_obj.group(1)
         elif attr == 'start_date' or attr == 'deadline_date':
             # 日を決定
